@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  font-family: "rfont" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+div {
+  font-family: "rfont" !important;
+}
+code {
+}
+::-webkit-scrollbar {
+  width: 0px;
+}
+h4 {
+  color: #383605;
+}
+/* @font-face {
+  font-family: 'rfont';
+  src: url("../src/Fonts/Roboto-Regular.ttf");
+} */
+
+/* @font-face {
+  font-family: "rfont";
+  src: url("../src/Fonts/Montserrat-Regular.ttf");
+} */
+
+@font-face {
+  font-family: "rfont";
+  src: url("../src/Fonts/NotoSans-Regular.ttf");
+}

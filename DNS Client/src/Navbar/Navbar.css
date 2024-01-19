@@ -1,0 +1,29 @@
+img.navbar-buttons {
+  width: 25px;
+}
+
+.page-components {
+  margin-top: 70px;
+  width: 50px;
+  height: 75vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  align-items: start;
+}
+
+.buttonDiv {
+  position: relative;
+  height: 20px;
+}
+.inner-title {
+  display: flex;
+  align-content: space-around;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+h4.title-tag {
+  color: white;
+  margin-left: 30px;
+}

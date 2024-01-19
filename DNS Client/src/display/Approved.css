@@ -1,0 +1,6 @@
+.display-div-approved {
+  position: relative;
+  width: 85vw;
+  overflow: scroll;
+  height: 60vh;
+}
