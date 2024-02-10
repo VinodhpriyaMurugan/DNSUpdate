@@ -35,7 +35,8 @@ const Login = () => {
           localStorage.setItem("branch", Response.data.branch);
           localStorage.setItem("dept", Response.data.department);
           localStorage.setItem("user", Response.data.user_name);
-          if (Response.data.role === "user,admin") {
+          if (localStorage.getItem("role") === "admin,user") {
+            console.log("Response.data.role", Response.data.role);
             navigate("/admin", {
               state: {
                 user: Response.data.user_name,

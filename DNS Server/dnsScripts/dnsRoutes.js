@@ -3,7 +3,6 @@ module.exports = (app) => {
   const dnsRecord = require("./index");
   console.log("Router called ========>");
   router.post("/createDnsRecord", dnsRecord.createRecord);
-  // router.post('/getRecord', dnsRecord.getRecord)
   router.get("/getCreateActionDnsRecord", dnsRecord.getCreateRecord);
   router.get("/getDeleteActionDnsRecord", dnsRecord.getDeleteRecord);
   router.get("/getModifyActionDnsRecord", dnsRecord.getModifyRecord);
@@ -21,7 +20,5 @@ module.exports = (app) => {
     "/getApprovedDnsRecordByUser/:id",
     dnsRecord.getApprovedDnsRecordByUser
   );
-  //
-
   app.use("/api/dns", router);
 };

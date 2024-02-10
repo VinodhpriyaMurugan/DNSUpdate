@@ -9,6 +9,9 @@ import Select from "react-select";
 import moment from "moment/moment";
 import close from "../../Assets/close-circle-svgrepo-com.svg";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
+import { Box, Modal } from "@material-ui/core";
+// import { IoMdAdd } from "react-icons";
 export default function AdminDashboard() {
   const location = useLocation();
   const name = location.state.user;
@@ -90,10 +93,17 @@ export default function AdminDashboard() {
     <div className="page-body">
       <Navbar />
       <div className="content-area">
-        <h4>{name}</h4>
-        <button className="create-btn" onClick={handleCreateRecord}>
-          Create Record
-        </button>
+        <div className="name-div">
+          <h4>{name}</h4>
+          <button
+            className="create-btn"
+            onClick={handleCreateRecord}
+            style={{ color: "black", fontWeight: "bolder" }}
+          >
+            Create Record
+          </button>
+        </div>
+
         {countInfo && (
           <div className="data-div">
             <div className="count-div">
@@ -119,7 +129,7 @@ export default function AdminDashboard() {
                 </h1>
                 <h6 className="countLabel">Delete</h6>
               </div>
-            </div>
+            </div>{" "}
           </div>
         )}
 
@@ -176,7 +186,47 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-      {showForward && (
+      <Modal
+        open={showForward}
+        // onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        style={{ backgroundColor: "transparent" }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Select
+            options={adminDrop}
+            placeholder={adminPlaceHolder}
+            value={adminValue}
+            onChange={setValueForAdmin}
+            isRequired
+          ></Select>
+          <Button
+            variant="outlined"
+            color={"info"}
+            sx={{
+              width: "1vw",
+
+              position: "absolute",
+            }}
+          >
+            {`    X  `}
+          </Button>
+        </Box>
+      </Modal>
+      {/* {showForward && (
         <div className="forwardDiv">
           <div className="drop-down-div">
             <img
@@ -201,7 +251,7 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

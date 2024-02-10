@@ -21,6 +21,7 @@ const Home = () => {
   const [dnsNames, setDnsNames] = useState([""]);
   const [ttl, setTTL] = useState([""]);
   const [ipAddresses, setIpAddresses] = useState([""]);
+  const [fqdnName, setFqdnName] = useState([""]);
   const [cNames, setCNames] = useState([""]);
   const [service, setService] = useState([""]);
   const [protocol, setProtocol] = useState([""]);
@@ -73,12 +74,12 @@ const Home = () => {
         setShowAlert(true);
         setTimeout(() => {
           setShowAlert(false);
-          navigate("/user", {
+          navigate("/dashboard", {
             state: {
-              user: "user",
+              user: "admin",
             },
           });
-        }, 10000);
+        }, 2000);
 
         console.log("File upload response ======>", Response.data);
       });
@@ -147,7 +148,7 @@ const Home = () => {
           zone_name: zoneNames[i],
           dns_name: dnsNames[i],
           ip_address: ipAddresses[i],
-          fqdn_name: "sdf",
+          fqdn_name: fqdnName[i],
           service: service[i],
           protocol: protocol[i],
           domain: "domain",
@@ -187,7 +188,7 @@ const Home = () => {
             }
             // Navigate to the user page
           }
-          uploadFile(ticketId);
+          uploadFile(ticketId); // uploading  excel file
           console.log("Response tickets......", response.data);
         })
         .catch((error) => {
@@ -255,7 +256,11 @@ const Home = () => {
     updatedIpAddresses[index] = value;
     setIpAddresses(updatedIpAddresses);
   };
-
+  const onFqdnName = (index, value) => {
+    const updatedFqdnName = [...fqdnName];
+    updatedFqdnName[index] = value;
+    setFqdnName(updatedFqdnName);
+  };
   const onCNameChange = (index, value) => {
     const updatedCNames = [...cNames];
     updatedCNames[index] = value;
@@ -347,21 +352,32 @@ const Home = () => {
                 fullWidth
               />
             </Grid>
-            {dnsRecordTypes[i] === "A" ||
-              (dnsRecordTypes[i] === "AAAARecord" && (
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    required
-                    label="IP Address"
-                    value={ipAddresses[i]}
-                    onChange={(event) =>
-                      onIpAddressChange(i, event.target.value)
-                    }
-                    variant="outlined"
-                    fullWidth
-                  />
-                </Grid>
-              ))}
+            {dnsRecordTypes[i] === "MX" && (
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  required
+                  label="FQDN Name"
+                  value={fqdnName[i]}
+                  onChange={(event) => onFqdnName(i, event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+            )}
+
+            {(dnsRecordTypes[i] === "A" ||
+              dnsRecordTypes[i] === "AAAARecord") && (
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  required
+                  label="IP Address"
+                  value={ipAddresses[i]}
+                  onChange={(event) => onIpAddressChange(i, event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+            )}
             {dnsRecordTypes[i] === "CNAME" && (
               <Grid item xs={12} sm={4}>
                 <TextField

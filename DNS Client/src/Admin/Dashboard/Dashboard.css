@@ -2,7 +2,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(133deg, #faf9f4 0%, #efeb81 100%);
+  /* background: linear-gradient(133deg, #faf9f4 0%, #efeb81 100%); */
   /* background: url("../../Assets/Bg.jpg"); */
   /* background: linear-gradient(45deg, #e1efe6 50%, #cbe3b33d 50%); */
   color: #383605;
@@ -102,7 +102,7 @@ img.close-btn {
 }
 .content-area {
   position: fixed;
-  margin-top: 10%;
+  margin-top: 12%;
   width: 84vw;
   margin-left: 215px;
   height: 85vh;
@@ -122,13 +122,20 @@ button.serach-btn {
   color: white;
   border-radius: 4px;
 }
+.name-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .data-div {
   position: relative;
   width: 70vw;
   height: 23vh;
   /* left: 25vw; */
   /* background-color: antiquewhite; */
-  display: grid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 button.implement-btn {
@@ -180,11 +187,12 @@ img.logout-btn {
 .forwardDiv {
   position: relative;
   width: 490px;
-  height: 44vh;
-  margin-left: 415px;
+  height: 25vh;
+  margin-left: 30vw;
   background-color: #d4e6e6;
-  margin-top: 105px;
+  margin-top: 6vw;
   margin-bottom: 70px;
+  /* display: flex; */
 }
 .drop-down-div {
   position: absolute;

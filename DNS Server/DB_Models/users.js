@@ -12,14 +12,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    department: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    branch: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
     role: {
       type: Sequelize.STRING,
       allowNull: false,

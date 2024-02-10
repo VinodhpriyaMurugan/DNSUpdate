@@ -8,6 +8,7 @@ import Navbar from "../Navbar/Navbar";
 import { Box, Checkbox, Modal } from "@material-ui/core";
 import { DataGrid, GridCheckboxSelectionModel } from "@mui/x-data-grid";
 import moment from "moment";
+import { ErrorToastAlert, SuccessToastAlert } from "../Admin/Toast";
 export default function Display() {
   const location = useLocation();
   const ticket = location.state.ticket;
@@ -129,35 +130,57 @@ export default function Display() {
     setOpen(true);
   };
   const handleApprove = async (value) => {
-    console.log("Approve value============>", value);
-    let approveValue = {
-      status: "Approved",
-      id: value,
-      date: moment(scheduledDate).format("DD-MMM-YYYY"),
-    };
-    let result = await axios.post(
-      "http://localhost:3100/api/dns/updateDnsRecord",
-      approveValue
+    console.log(
+      "Approve value============>",
+      moment(scheduledDate).format("DD-MMM-YYYY")
     );
-    if (result) {
-      setBtnValue("Approved");
-      setShow("block");
-      setReject("none");
+    if (moment(scheduledDate).format("DD-MMM-YYYY") != "Invalid date") {
+      let approveValue = {
+        status: "Approved",
+        id: value,
+        date:
+          moment(scheduledDate).format("DD-MMM-YYYY") != "Invalid date"
+            ? moment(scheduledDate).format("DD-MMM-YYYY")
+            : null,
+      };
+      let result = await axios.post(
+        "http://localhost:3100/api/dns/updateDnsRecord",
+        approveValue
+      );
+      if (result) {
+        SuccessToastAlert("Status approved");
+        setBtnValue("Approved");
+        setShow("block");
+        setReject("none");
+        setTimeout(() => {
+          setOpen(false);
+        }, 1000);
+      }
+    } else {
+      ErrorToastAlert("Kindly schedule the date and approve");
+    }
+  };
+  const handleReject = async (value, info) => {
+    if (info === "Run") {
+      handleRun();
+    } else {
+      console.log("Approve value============>", value);
+
+      let approveValue = {
+        status: "Rejected",
+        id: value,
+        date:
+          moment(scheduledDate).format("DD-MMM-YYYY") != "Invalid date"
+            ? moment(scheduledDate).format("DD-MMM-YYYY")
+            : null,
+      };
+      let result = await axios.post(
+        "http://localhost:3100/api/dns/updateDnsRecord",
+        approveValue
+      );
+      console.log("result==>", result);
     }
 
-    console.log("result from backend=====>", result);
-  };
-  const handleReject = async (value) => {
-    console.log("Approve value============>", value);
-    let approveValue = {
-      status: "Rejected",
-      id: value,
-      date: moment(scheduledDate).format("DD-MMM-YYYY"),
-    };
-    let result = await axios.post(
-      "http://localhost:3100/api/dns/updateDnsRecord",
-      approveValue
-    );
     setShow("none");
     setReject("block");
     setOpen(true);
@@ -169,8 +192,10 @@ export default function Display() {
       })
       .then((response) => {
         console.log(response);
-        // Handle data
-        // setOutput(response.data);
+      })
+      .catch((error) => {
+        ErrorToastAlert("Script running failed");
+        console.error("Error occurred:", error);
       });
   };
   const goToHome = () => {
@@ -394,7 +419,12 @@ export default function Display() {
 
               <Button
                 className="implement-display-btn"
-                onClick={() => handleReject(viewRecord.id)}
+                onClick={() =>
+                  handleReject(
+                    viewRecord.id,
+                    viewRecord.status === "Approved" ? "Run" : "Reject"
+                  )
+                }
                 style={{ display: reject }}
               >
                 {viewRecord.status === "Approved" ? "Run" : "Reject"}

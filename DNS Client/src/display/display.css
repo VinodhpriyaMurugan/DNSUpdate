@@ -23,8 +23,8 @@ button.btn.btn-primary {
   height: 350px;
   background-color: #066550ed;
   border-radius: 20px;
-  top: 94px;
-  left: 240px;
+  top: 25vh;
+  left: 20vw;
 }
 .value-div {
   display: grid;

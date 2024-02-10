@@ -119,8 +119,7 @@ function RegistrationForm(props) {
       userType: userType.join(","),
       password,
       selectedRole,
-      selectedBranch,
-      selectedDepartment,
+
       geo,
     };
     console.log("userValues ===============>", userValues);
@@ -177,7 +176,7 @@ function RegistrationForm(props) {
               </div>
             </div>
 
-            <div className="col-md-4">
+            {/* <div className="col-md-4">
               <div className="form-group">
                 <label>Select Branch:</label>
                 <Select
@@ -202,7 +201,7 @@ function RegistrationForm(props) {
                   }))}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="col-md-4">
               <div className="form-group">

@@ -95,6 +95,10 @@ DNS_Runner.runSshCSV = (req, res) => {
                   else res.send("STDERR: " + result.stderr.toString());
                 });
             });
+          })
+          .catch((error) => {
+            console.error("Error occurred:", error);
+            res.status(500).json("Script running failed");
           });
       });
   });
@@ -362,17 +366,31 @@ DNS_Runner.getApprovedDnsRecordByUser = async (req, res) => {
 };
 DNS_Runner.updateDnsRecord = async (req, res) => {
   try {
+    let dateVal = null;
     console.log("inside get dns by type");
-    const affectedRows = await DNSRecord.update(
-      { status: req.body.status, scheduled_on: req.body.date },
-      { where: { id: req.body.id } }
-    );
+    let affectedRows = [];
+    if (req.body.date) {
+      console.log("if condition");
+      dateVal = req.body.date; // Corrected assignment
+      affectedRows = await DNSRecord.update(
+        { status: req.body.status, scheduled_on: dateVal },
+        { where: { id: req.body.id } }
+      );
+    } else {
+      console.log("else condition");
+      affectedRows = await DNSRecord.update(
+        { status: req.body.status },
+        { where: { id: req.body.id } }
+      );
+    }
     console.log(`Updated ${affectedRows} row(s).`);
-    res.json(affectedRows);
+    res.status(200).json("Updated Record");
   } catch (error) {
     console.error("Error occurred during update:", error);
+    res.status(500).json("Updating failed !!!!");
   }
 };
+
 DNS_Runner.getAllRecord = async (req, res) => {
   const allRecord = await DNSRecord.findAll();
   res.json(allRecord);

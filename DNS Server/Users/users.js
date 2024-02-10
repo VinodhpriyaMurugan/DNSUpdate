@@ -7,6 +7,7 @@ require("dotenv").config({ path: "./../.env" });
 exports.create = (req, res) => {
   console.log("Request body==========>", req.body);
   const user_name = req.body.user_name;
+  console.log("User_name", Users.findByPk(user_name));
   Users.findByPk(user_name).then((user) => {
     if (user) {
       let error = "User_name Exists in Database.";
@@ -16,9 +17,9 @@ exports.create = (req, res) => {
       const newUser = {
         user_name: req.body.name,
         password: req.body.password,
-        user_id: req.body.userId,
-        department: req.body.selectedDepartment.label,
-        branch: req.body.selectedBranch.label,
+        // user_id: req.body.userId,
+        department: "dept",
+        branch: "branch",
         role: req.body.userType,
         email_id: req.body.email,
         role_type: req.body.selectedRole,
@@ -33,7 +34,7 @@ exports.create = (req, res) => {
           Users.create(newUser)
             .then((user) => {
               console.log("user======>", user);
-              res.json(user);
+              res.status(200).json(user);
             })
             .catch((err) => res.status(400).json(err));
         });

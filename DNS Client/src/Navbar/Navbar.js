@@ -128,11 +128,11 @@ export default function Navbar() {
                   <img src={settings} alt="" className="settings-btn"></img>
                 </button>
               </div>
-              <div className="logout-div">
+              {/* <div className="logout-div">
                 <button className="logout-btn">
                   <img src={settings} alt="" className="settings-btn"></img>
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

@@ -90,6 +90,9 @@ export default function Dashboard() {
   const handleImplementBtn = () => {
     navigate("/implement");
   };
+  const handleCreateRecord = () => {
+    navigate("/home");
+  };
   const handleSearch = (e) => {
     console.log(e);
     if (e) {
@@ -111,7 +114,16 @@ export default function Dashboard() {
       <Navbar />
       <div className="top-content-area">
         <div className="top-content-div">
-          <h4>{name}</h4>
+          <div className="name-div">
+            <h4>{name}</h4>
+            <button
+              className="create-btn"
+              onClick={handleCreateRecord}
+              style={{ color: "black", fontWeight: "bolder" }}
+            >
+              Create Record
+            </button>
+          </div>
           <input
             type="text"
             placeholder="search"
@@ -171,13 +183,8 @@ export default function Dashboard() {
                     <th>Req_date</th>
                     <th>Req_id</th>
                     <th>Requested_user</th>
-                    <th>user_department</th>
-                    {/* <th>uploaded_file</th> */}
-                    <th>Assigned_to</th>
-                    <th>Status</th>
-                    {/* <th>Environment</th> */}
-                    <th>Ageing</th>
-                    <th style={{ textAlign: "center" }}>Actions</th>
+
+                    <th >Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -188,9 +195,7 @@ export default function Dashboard() {
                       <td>{user.ticket_id}</td>
                       <td>{user.user.user_name}</td>
 
-                      <td>{user.user.department}</td>
-                      <td>{user.status ? user.status : ""}</td>
-                      <td>
+                      {/* <td>
                         {user.user.createdAt
                           ? Math.ceil(
                               Math.abs(
@@ -202,15 +207,15 @@ export default function Dashboard() {
                                 (1000 * 3600 * 24)
                             )
                           : ""}
-                      </td>
-                      <td>
+                      </td> */}
+                      {/* <td>
                         <button
                           className="btn btn-primary btn-sm"
                           onClick={() => handleForwardBtn(user.ticket_id)}
                         >
                           Forward
                         </button>
-                      </td>
+                      </td> */}
                       <td>
                         <button
                           className="btn btn-primary btn-sm"

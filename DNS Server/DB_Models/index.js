@@ -9,7 +9,7 @@ dotenv.config({ path: PATH.resolve("DB_Models", "..", ".env") });
 initialize();
 
 async function initialize() {
-  const connectionString = `postgres://postgres:postgres@127.0.0.1:5432/postgres`;
+  const connectionString = `postgres://postgres:Dinesh@123#@18.191.166.144:5432/postgres`;
   const client = new Client({ connectionString });
 
   try {
@@ -22,8 +22,8 @@ async function initialize() {
   }
 }
 
-const sequelize = new Sequelize("dns_server", "postgres", "postgres", {
-  host: "127.0.0.1",
+const sequelize = new Sequelize("dns_server", "postgres", "Dinesh@123#", {
+  host: "18.191.166.144",
   port: 5432,
   dialect: "postgres",
   // operatorsAliases: false,

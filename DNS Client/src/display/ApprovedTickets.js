@@ -47,8 +47,8 @@ export default function ApprovedTickets() {
     fetchData();
   }, []);
   const gotoHome = () => {
-    navigate("/user", {
-      state: { value: false },
+    navigate("/dashboard", {
+      state: { user: "admin" },
     });
   };
   return (
