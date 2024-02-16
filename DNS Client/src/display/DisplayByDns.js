@@ -28,7 +28,6 @@ export default function DisplayByDns(props) {
   //   }
   // };
   const handleCheckboxChange = (event) => {
-    alert(event.selectionModel);
     const checkedRows = event.selectionModel;
     setSelectedRows(checkedRows);
   };
@@ -51,7 +50,7 @@ export default function DisplayByDns(props) {
     console.log("Run Dns Id", selectedRows);
 
     axios
-      .get(`${baseUrl}api/dns/runDNSByCSV`, { params: { id: id } })
+      .get(`${baseUrl}/api/dns/runDNSByCSV`, { params: { id: id } })
       .then((response) => {
         console.log(response);
         // Handle data
@@ -59,7 +58,6 @@ export default function DisplayByDns(props) {
       });
   };
   const handleTabChange = (event, newValue) => {
-    alert(newValue);
     setSelectedTab(newValue);
   };
   useEffect(() => {
@@ -139,7 +137,6 @@ export default function DisplayByDns(props) {
     setSelectedRows(selectionModel);
   };
   const setDate = async (value) => {
-    alert(value);
     let allResponse = await axios.get(
       `${baseUrl}api/dns/getDnsRecordByDate/${value}`
     );

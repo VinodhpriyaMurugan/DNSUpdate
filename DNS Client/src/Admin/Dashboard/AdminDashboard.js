@@ -11,6 +11,7 @@ import close from "../../Assets/close-circle-svgrepo-com.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import { Box, Modal } from "@material-ui/core";
+import { baseUrl } from "../../config/UrlConfig";
 // import { IoMdAdd } from "react-icons";
 export default function AdminDashboard() {
   const location = useLocation();
@@ -27,21 +28,19 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const adminPlaceHolder = adminValue !== null ? placeValue : "Admin";
   useEffect(() => {
-    axios.get(`http://localhost:3100/api/dns/getCount`).then((response) => {
+    axios.get(`${baseUrl}/api/dns/getCount`).then((response) => {
       axios
         .get(
-          `http://localhost:3100/api/ticket/getTicketsByUser/${localStorage.getItem(
+          `${baseUrl}/api/ticket/getTicketsByUser/${localStorage.getItem(
             "userId"
           )}`
         )
         .then((response) => {
-          axios
-            .get(`http://localhost:3100/api/users/getUserByRole`)
-            .then((response) => {
-              setUserRole(response.data);
-              console.log("all user by role ======>", response.data);
-              setDropDown(response.data);
-            });
+          axios.get(`${baseUrl}/api/users/getUserByRole`).then((response) => {
+            setUserRole(response.data);
+            console.log("all user by role ======>", response.data);
+            setDropDown(response.data);
+          });
           console.log("all ticket======>", response.data);
           setUserInfo(response.data);
         });
@@ -84,7 +83,7 @@ export default function AdminDashboard() {
       status: "assigned",
     };
     axios
-      .post("http://localhost:3100/api/ticket/updateTicket", updateValue)
+      .post(`${baseUrl}/api/ticket/updateTicket`, updateValue)
       .then((response) => {
         console.log(response.data);
       });

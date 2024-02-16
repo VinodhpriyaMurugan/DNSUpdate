@@ -37,16 +37,27 @@ DNS_Runner.runSsh = (req, res) => {
         });
     });
 };
+
 DNS_Runner.runSshCSV = (req, res) => {
+  const csvFolder = "csv_files"; // Specify the folder name where CSV files will be stored
+  const csvFileName = `${req.query.id}.csv`; // Generate CSV file name based on the query id
+  const csvFilePath = `${csvFolder}/${csvFileName}`; // Construct the full path for the CSV file
+
   console.log(req.query.id);
-  DNSRecord.findOne({
+
+  // Ensure the folder exists
+  if (!fs.existsSync(csvFolder)) {
+    fs.mkdirSync(csvFolder);
+  }
+
+  DNSRecord.findAll({
     where: {
-      id: req.query.id,
+      ticket_id: req.query.id,
     },
   }).then((response) => {
     console.log("Run SSH for ", response);
     const csvWriter = createCsvWriter({
-      path: "record.csv",
+      path: csvFilePath, // Use the full path for the CSV file
       header: [
         { id: "Zone", title: "Zone" },
         { id: "Name", title: "Name" },
@@ -54,20 +65,23 @@ DNS_Runner.runSshCSV = (req, res) => {
         { id: "RRData", title: "RRData" },
       ],
     });
-    let rrData = "";
-    if (response.dns_record_type === "A") {
-      rrData = response.ip_address;
-    } else if (response.dns_record_type === "CNAME") {
-      rrData = response.c_name;
-    }
-    let Data = [
-      {
+    let Data = [];
+    response.forEach((response) => {
+      let rrData = "";
+      if (response.dns_record_type === "A") {
+        rrData = response.ip_address;
+      } else if (response.dns_record_type === "CNAME") {
+        rrData = response.c_name;
+      }
+      let record = {
         Zone: response.zone_name,
         Name: response.dns_name,
         RRType: response.dns_record_type,
         RRData: rrData,
-      },
-    ];
+      };
+      Data.push(record);
+    });
+
     console.log("Data==========>", Data);
     csvWriter
       .writeRecords(Data) // returns a promise
@@ -81,20 +95,22 @@ DNS_Runner.runSshCSV = (req, res) => {
             tryKeyboard: true,
           })
           .then(() => {
-            // Add-DnsServerResourceRecordA -Name demo -IPv4Address 192.168.0.201 -ZoneName dcloud.com
-            //nslookup -type=A google.com
-            ssh.putFile("record.csv", "C:/records.csv").then(function (result) {
-              console.log("File Moved");
-              ssh
-                .execCommand("PowerShell -File C:/temp/ADD_DNS_Records.ps1")
-                .then(function (result) {
-                  console.log("STDOUT: " + result.stdout);
-                  console.log("STDERR: " + result.stderr);
-                  if (result.stdout)
-                    res.send("STDOUT: " + result.stdout.toString());
-                  else res.send("STDERR: " + result.stderr.toString());
-                });
-            });
+            //     // Add-DnsServerResourceRecordA -Name demo -IPv4Address 192.168.0.201 -ZoneName dcloud.com
+            //     //nslookup -type=A google.com
+            ssh
+              .putFile(`${csvFile}.csv`, `C:/${csvFile}.csv`)
+              .then(function (result) {
+                console.log("File Moved");
+                ssh
+                  .execCommand("PowerShell -File C:/temp/ADD_DNS_Records.ps1")
+                  .then(function (result) {
+                    console.log("STDOUT: " + result.stdout);
+                    console.log("STDERR: " + result.stderr);
+                    if (result.stdout)
+                      res.send("STDOUT: " + result.stdout.toString());
+                    else res.send("STDERR: " + result.stderr.toString());
+                  });
+              });
           })
           .catch((error) => {
             console.error("Error occurred:", error);
@@ -102,31 +118,6 @@ DNS_Runner.runSshCSV = (req, res) => {
           });
       });
   });
-  // ssh.connect({
-  //     host: '183.83.187.19',
-  //     port: '4567',
-  //     username: 'ragu',
-  //     password,
-  //     tryKeyboard: true,
-
-  // }).then(() => {
-  //     // Add-DnsServerResourceRecordA -Name demo -IPv4Address 192.168.0.201 -ZoneName dcloud.com
-  //     //nslookup -type=A google.com
-
-  //     ssh.execCommand('PowerShell -File C:/temp/ADD_DNS_Records.ps1').then(function (result) {
-  //         console.log('STDOUT: ' + result.stdout)
-  //         console.log('STDERR: ' + result.stderr)
-  //         if (result.stdout)
-  //             res.send('STDOUT: ' + result.stdout.toString());
-  //         else
-  //             res.send('STDERR: ' + result.stderr.toString())
-
-  //         // if (ssh.isConnected()) {
-  //         //     console.log("Closing connection");
-  //         //     ssh.dispose()
-  //         // }
-  //     })
-  // })
 };
 
 // DNS_Runner.createRecord = (req, res) => {
@@ -320,10 +311,30 @@ DNS_Runner.getTypeUnscheduled = async (req, res) => {
 };
 
 DNS_Runner.getDnsRecordById = async (req, res) => {
-  console.log("inside get dns by type");
+  console.log("inside get dns by type", req.params.id);
   DNSRecord.findAll({
     where: {
       id: req.params.id,
+    },
+  })
+    .then((result) => {
+      if (result) {
+        console.log("result==========>", result);
+        res.json(result);
+      } else {
+        res.status(404).json({ message: "Data not found." });
+      }
+    })
+    .catch((error) => {
+      console.error("Error retrieving data:", error);
+      res.status(500).json({ message: "Error retrieving data." });
+    });
+};
+DNS_Runner.getDnsRecordByUser = async (req, res) => {
+  console.log("inside get dns by type", req.params.id);
+  DNSRecord.findAll({
+    where: {
+      user: req.params.id,
     },
   })
     .then((result) => {
@@ -390,16 +401,87 @@ DNS_Runner.updateDnsRecord = async (req, res) => {
     res.status(500).json("Updating failed !!!!");
   }
 };
+DNS_Runner.updateDnsRecordByUser = async (req, res) => {
+  try {
+    const dataArray = req.body; // Assuming req.body is the array of objects
 
+    // Loop through the array and update records
+    for (const data of dataArray) {
+      const {
+        id,
+        dns_type,
+        action,
+        dns_record_type,
+        date,
+        dns_name,
+        ip_address,
+        fqdn_name,
+        service,
+        protocol,
+        domain,
+        weight,
+        port_no,
+        priority,
+        domain_name,
+        zone_name,
+        c_name,
+        service_tier,
+        testing_mode,
+        description,
+        ticket_id,
+        user,
+        scheduled_on,
+        status,
+      } = data;
+
+      await DNSRecord.update(
+        {
+          dns_type,
+          action,
+          dns_record_type,
+          date,
+          dns_name,
+          ip_address,
+          fqdn_name,
+          service,
+          protocol,
+          domain,
+          weight,
+          port_no,
+          priority,
+          domain_name,
+          zone_name,
+          c_name,
+          service_tier,
+          testing_mode,
+          description,
+          ticket_id,
+          user,
+          scheduled_on,
+          status,
+        },
+        { where: { id } }
+      );
+    }
+
+    // Respond with success message
+    res.status(200).json({ message: "Records updated successfully" });
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating records:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 DNS_Runner.getAllRecord = async (req, res) => {
   const allRecord = await DNSRecord.findAll();
   res.json(allRecord);
   console.log("all Record data==>", allRecord);
 };
 DNS_Runner.getCount = async (req, res) => {
+  console.log("getcount method");
   const create = await DNSRecord.count({
     where: {
-      status: "Approved", // Replace with your desired WHERE condition
+      status: "Approved",
     },
   });
   const scheduled = await DNSRecord.count({

@@ -11,6 +11,7 @@ import record from "../Assets/report-text-svgrepo-com.svg";
 import home from "../Assets/home-svgrepo-com.svg";
 
 import "./Navbar.css";
+import { Button, IconButton } from "@mui/material";
 export default function Navbar() {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -45,16 +46,17 @@ export default function Navbar() {
           <div className="header">
             <div className="inner-title">
               <img src={logo} className="logo-image"></img>
-              <h4 className="title-tag">Dsmart</h4>
+              <h4 className="title-tag">D-SMART</h4>
             </div>
           </div>
           <div className="header">
-            <img
-              src={logout}
-              alt=""
-              className="logout-btn"
+            <Button
+              style={{ background: "Dodgerblue", color: "white" }}
               onClick={handleLogout}
-            ></img>
+            >
+              Logout
+            </Button>
+            {/* <img src={logout} alt="" className="logout-btn"></img> */}
             {/* <button className='serach-btn'>Search</button> */}
           </div>
         </div>

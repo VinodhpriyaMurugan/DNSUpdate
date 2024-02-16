@@ -23,7 +23,6 @@ img.logo-image {
   grid-template-columns: 1fr 150px;
   /* left: 15vw; */
   height: 60px;
-  background-color: #201f0d;
   z-index: 2;
 }
 .side-navbar {

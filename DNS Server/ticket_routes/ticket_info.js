@@ -8,6 +8,127 @@ const dnsRecords = db.dns_records;
 const Op = db.Sequelize.Op;
 const basePath = "TicketFiles";
 require("dotenv").config({ path: "./../.env" });
+const exceljs = require("exceljs");
+
+// Define a route to handle Excel file download
+exports.downloadExcel = async (req, res) => {
+  try {
+    // Create a new workbook
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet("DNS Records");
+
+    // Define the headers
+    const headers = [
+      "dns_type",
+      "action",
+      "dns_record_type",
+      "date",
+      "dns_name",
+      "ip_address",
+      "fqdn_name",
+      "service",
+      "protocol",
+      "domain",
+      "weight",
+      "port_no",
+      "priority",
+      "domain_name",
+      "zone_name",
+      "c_name",
+      "service_tier",
+      "testing_mode",
+      "description",
+      "ticket_id",
+      "user",
+      "scheduled_on",
+      "status",
+    ];
+
+    // Add headers to the worksheet
+    worksheet.addRow(headers);
+
+    // Set up the HTTP response headers
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="dns_records.xlsx"'
+    );
+
+    // Write the workbook to the response
+    await workbook.xlsx.write(res);
+
+    // End the response
+    res.end();
+  } catch (error) {
+    console.error("Error creating Excel file:", error);
+    return res.status(500).send("Internal server error.");
+  }
+};
+
+exports.uploadFile = async (req, res) => {
+  try {
+    // if (!req.file) {
+    //   return res.status(400).send("No file uploaded.");
+    // }
+    const newTicket = {
+      user_id: 1,
+      ticket_id: req.body.ticket,
+      ticket_status: "Pending",
+      file_name: "fileName",
+    };
+
+    // Create ticket
+    const ticket = await Tickets.create(newTicket);
+    console.log("Ticket created:", ticket);
+    const workbook = new exceljs.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+
+    // Assuming the first worksheet contains the data
+    const worksheet = workbook.getWorksheet(1);
+    // Iterate through rows and update the database
+    await Promise.all(
+      worksheet.eachRow(async (row, rowNumber) => {
+        if (rowNumber > 1) {
+          // Skip header row
+          const rowData = row.values;
+          // Update database using Sequelize
+          await dnsRecords.create({
+            // Update the fields with the data from the Excel file
+            dns_type: rowData[1],
+            action: rowData[2],
+            dns_record_type: rowData[3],
+            dns_name: rowData[5],
+            ip_address: rowData[6],
+            fqdn_name: rowData[7],
+            service: rowData[8],
+            protocol: rowData[9],
+            domain: rowData[10],
+            weight: rowData[11],
+            port_no: rowData[12],
+            priority: rowData[13],
+            domain_name: rowData[14],
+            zone_name: rowData[15],
+            c_name: rowData[16],
+            service_tier: rowData[17],
+            testing_mode: rowData[18],
+            description: rowData[19],
+            ticket_id: req.body.ticket,
+            user: req.body.user,
+          });
+        }
+      })
+    );
+
+    return res.status(200).send("Excel file uploaded and data updated.");
+  } catch (error) {
+    console.error("Error processing file:", error);
+    return res.status(500).send("Internal server error.");
+  }
+};
+
 exports.create = async (req, res) => {
   console.log("inside create==========>");
   try {
@@ -68,7 +189,7 @@ exports.create = async (req, res) => {
 };
 
 async function createTicket(userId, ticketId, status, fileName, res) {
-  console.log("create ticket======>");
+  console.log("creating ticket");
   try {
     const newTicket = {
       user_id: userId,
@@ -76,7 +197,7 @@ async function createTicket(userId, ticketId, status, fileName, res) {
       ticket_status: status,
       file_name: fileName,
     };
-    console.log();
+
     // Create ticket
     const ticket = await Tickets.create(newTicket);
     console.log("Ticket created:", ticket);

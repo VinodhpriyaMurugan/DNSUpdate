@@ -9,6 +9,7 @@ import { Box, Checkbox, Modal } from "@material-ui/core";
 import { DataGrid, GridCheckboxSelectionModel } from "@mui/x-data-grid";
 import moment from "moment";
 import { ErrorToastAlert, SuccessToastAlert } from "../Admin/Toast";
+import { baseUrl } from "../config/UrlConfig";
 export default function Display() {
   const location = useLocation();
   const ticket = location.state.ticket;
@@ -27,12 +28,13 @@ export default function Display() {
   const [showDate, setShowDate] = useState(true);
   const [scheduleTag, setScheduleTag] = useState("Schedule on");
   const [reschedule, setReschedule] = useState(false);
+
   const navigate = useNavigate();
   const runDns = (id) => {
     console.log("Run Dns Id", id);
     // ${process.env.REACT_APP_BASE_URL}/api/dns/runDNSByCSV
     axios
-      .get(`http://localhost:3100/api/dns/runDNSByCSV`, { params: { id: id } })
+      .get(`${baseUrl}/api/dns/runDNSByCSV`, { params: { id: id } })
       .then((response) => {
         console.log(response);
         // Handle data
@@ -43,20 +45,12 @@ export default function Display() {
     console.log("inside use effect");
     const fetchData = async () => {
       let allResponse = await axios.get(
-        `http://localhost:3100/api/dns/getDnsRecord/${ticket}`
+        `${baseUrl}/api/dns/getDnsRecord/${ticket}`
       );
       let response = await axios.get(
-        `http://localhost:3100/api/dns/getCreateActionDnsRecord`
+        `${baseUrl}/api/dns/getCreateActionDnsRecord`
       );
-      // let record = await axios.get(`http://localhost:3100/api/dns/getRecord`)
-      // let deleteResponse = await axios.get(
-      //   `http://localhost:3100/api/dns/getDeleteActionDnsRecord`
-      // );
-      // let modifyResponse = await axios.get(
-      //   `http://localhost:3100/api/dns/getModifyActionDnsRecord`
-      // );
-      // console.log(response.data);
-      // console.log(deleteResponse.data);
+
       console.log("allResponse.data", allResponse.data);
       setJsonTableData(allResponse.data);
 
@@ -97,9 +91,9 @@ export default function Display() {
     fetchData();
   }, []);
   const handleRowClick = async (params) => {
-    console.log(params.row.id);
+    alert(params.row.id);
     let value = await axios.get(
-      `http://localhost:3100/api/dns/getDnsRecordById/${params.row.id}`
+      `${baseUrl}/api/dns/getDnsRecordById/${params.row.id}`
     );
     setViewedRecord(value.data[0]);
     if (value.data[0].scheduled_on) {
@@ -144,7 +138,7 @@ export default function Display() {
             : null,
       };
       let result = await axios.post(
-        "http://localhost:3100/api/dns/updateDnsRecord",
+        `${baseUrl}/api/dns/updateDnsRecord`,
         approveValue
       );
       if (result) {
@@ -175,7 +169,7 @@ export default function Display() {
             : null,
       };
       let result = await axios.post(
-        "http://localhost:3100/api/dns/updateDnsRecord",
+        `${baseUrl}/api/dns/updateDnsRecord`,
         approveValue
       );
       console.log("result==>", result);
@@ -185,10 +179,24 @@ export default function Display() {
     setReject("block");
     setOpen(true);
   };
-  const handleRun = () => {
+  const handleAllRun = () => {
     axios
-      .get(`http://localhost:3100/api/dns/runDNSByCSV`, {
-        params: { id: viewRecord.id },
+      .get(`${baseUrl}/api/dns/runDNSByCSV`, {
+        params: { id: ticket },
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        ErrorToastAlert("Script running failed");
+        console.error("Error occurred:", error);
+      });
+  };
+  const handleRun = () => {
+    console.log(viewRecord);
+    axios
+      .get(`${baseUrl}/api/dns/runDNSByCSV`, {
+        params: { id: viewRecord.ticket_id },
       })
       .then((response) => {
         console.log(response);
@@ -206,38 +214,6 @@ export default function Display() {
   return (
     <div>
       <Navbar />
-      {/* {jsonTableArrayData && (
-        <table className="displayTable">
-          <thead>
-            <tr>
-              {tableToDisplay.map((header) => (
-                <th key={header}>{header}</th>
-              ))}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jsonTableArrayData.map((obj) => (
-              <tr key={obj.id}>
-                {tableToDisplay.map((header) => (
-                  <td key={header}>{obj[header]}</td>
-                ))}
-                <td>
-                  <Button
-                    key={obj.id}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      runDns(obj.id);
-                    }}
-                  >
-                    Run
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )} */}
 
       <div className="work-area-implement">
         <button className="run-btn" onClick={goToHome}>
@@ -262,10 +238,8 @@ export default function Display() {
               pageSizeOptions={[]}
             />
           </Box>
-          //  <div className="btn-area">
-
-          //   </div>
         )}
+        <Button onClick={handleAllRun}>Run</Button>
         <div className="modal-div" hidden={open}>
           <div className="viewDiv">
             <h4 className="ticketTag">

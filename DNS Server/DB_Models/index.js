@@ -23,7 +23,7 @@ async function initialize() {
 }
 
 const sequelize = new Sequelize("dns_server", "postgres", "Dinesh@123#", {
-  host: "18.191.166.144",
+  host: "3.21.129.26",
   port: 5432,
   dialect: "postgres",
   // operatorsAliases: false,

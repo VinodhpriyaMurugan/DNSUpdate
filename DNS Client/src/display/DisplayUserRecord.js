@@ -5,6 +5,7 @@ import axios from "axios";
 import "./display.css";
 import { Box } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
+import { baseUrl } from "../config/UrlConfig";
 export default function DisplayUserRecord() {
   const [rows, setRows] = useState([]);
   const [rowUnscheduled, setRowsUnscheduled] = useState([]);
@@ -19,7 +20,7 @@ export default function DisplayUserRecord() {
     console.log("inside use effect");
     const fetchData = async () => {
       let allResponse = await axios.get(
-        `http://localhost:3100/api/dns/getApprovedDnsRecordByUser/${localStorage.getItem(
+        `${baseUrl}/api/dns/getApprovedDnsRecordByUser/${localStorage.getItem(
           "userId"
         )}`
       );

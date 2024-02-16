@@ -9,6 +9,7 @@ import Select from "react-select";
 import moment from "moment/moment";
 import close from "../../Assets/close-circle-svgrepo-com.svg";
 import { useLocation, useNavigate } from "react-router-dom";
+import { baseUrl } from "../../config/UrlConfig";
 export default function Dashboard() {
   const location = useLocation();
   const name = location.state.user;
@@ -27,20 +28,16 @@ export default function Dashboard() {
   const [showSearch, setShowSearch] = useState(false);
   const adminPlaceHolder = adminValue !== null ? placeValue : "Admin";
   useEffect(() => {
-    axios.get(`http://localhost:3100/api/dns/getCount`).then((response) => {
-      axios
-        .get(`http://localhost:3100/api/ticket/getTickets`)
-        .then((response) => {
-          axios
-            .get(`http://localhost:3100/api/users/getUserByRole`)
-            .then((response) => {
-              setUserRole(response.data);
-              console.log("all user by role ======>", response.data);
-              setDropDown(response.data);
-            });
-          console.log("all ticket======>", response.data);
-          setUserInfo(response.data);
+    axios.get(`${baseUrl}/api/dns/getCount`).then((response) => {
+      axios.get(`${baseUrl}/api/ticket/getTickets`).then((response) => {
+        axios.get(`${baseUrl}/api/users/getUserByRole`).then((response) => {
+          setUserRole(response.data);
+          console.log("all user by role ======>", response.data);
+          setDropDown(response.data);
         });
+        console.log("all ticket======>", response.data);
+        setUserInfo(response.data);
+      });
       console.log("count ===============>", response.data);
       setCountInfo(response.data);
     });
@@ -82,7 +79,7 @@ export default function Dashboard() {
       status: "assigned",
     };
     axios
-      .post("http://localhost:3100/api/ticket/updateTicket", updateValue)
+      .post(`${baseUrl}/api/ticket/updateTicket`, updateValue)
       .then((response) => {
         console.log(response.data);
       });
@@ -99,7 +96,7 @@ export default function Dashboard() {
       setShowAdmin(false);
       setShowSearch(true);
       axios
-        .get(`http://localhost:3100/api/ticket/searchByTicket/${e}`)
+        .get(`${baseUrl}/api/ticket/searchByTicket/${e}`)
         .then((response) => {
           console.log("Search response ==>", response.data.details);
           setSearchUserInfo(response.data.details);
@@ -184,7 +181,7 @@ export default function Dashboard() {
                     <th>Req_id</th>
                     <th>Requested_user</th>
 
-                    <th >Actions</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>

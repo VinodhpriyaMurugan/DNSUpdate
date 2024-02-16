@@ -9,17 +9,19 @@
   /* background: url("../../Assets/Bg.jpg"); */
   /* background: linear-gradient(45deg, #e1efe6 50%, #cbe3b33d 50%); */
   border-radius: 27px;
-  background: url("../Assets/LoginImg.png"), lightgray 50% / cover no-repeat;
+  background-image: url("../Assets/LoginImg.jpg");
+  /* background: url("../Assets/LoginImg.jpg"), lightgray 50% / cover no-repeat; */
   color: #383605;
+  background-repeat: no-repeat;
 }
 .Login {
-  margin-left: 65%;
+  margin-left: 70%;
   /* padding: 10% 25% 10% 25%; */
   position: relative;
-  width: 320px;
+  width: 40vh;
   margin-top: 10%;
   border-radius: 10px;
-  height: 400px;
+  height: 80vh;
   box-shadow: -13px 12px 38px 0px rgba(249, 247, 247, 0.67) inset;
 }
 .form-div {
@@ -38,15 +40,18 @@ h3.login-header {
 }
 
 button.login-submit-btn {
-  height: 28px;
+  height: 6vh;
   padding: 0px;
-  width: 80px;
-  margin: 25px 107px;
+  width: 20vw;
+  margin: 26px 55px;
   border: none;
   outline: none;
   border-radius: 6px;
+  /* background-color: #efeb81; */
 }
-
+button.login-submit-btn:hover {
+  background-color: #f6c300;
+}
 img.login-image {
   width: 100px;
 }

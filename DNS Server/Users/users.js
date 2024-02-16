@@ -13,7 +13,6 @@ exports.create = (req, res) => {
       let error = "User_name Exists in Database.";
       return res.status(400).json({ error });
     } else {
-      console.log("Else part =============>");
       const newUser = {
         user_name: req.body.name,
         password: req.body.password,
@@ -141,6 +140,7 @@ exports.findOne = (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  console.log("reqqqqqqqqq", req.body);
   const user_name = req.body.user_name;
   const password = req.body.password;
   const user = await Users.findOne({

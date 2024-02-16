@@ -10,6 +10,7 @@ import moment from "moment/moment";
 import close from "../../Assets/close-circle-svgrepo-com.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApprovedTickets from "../../display/ApprovedTickets";
+import { baseUrl } from "../../config/UrlConfig";
 export default function UserDashboard() {
   const location = useLocation();
   // const name = location.state.user.toUpperCase();
@@ -30,14 +31,14 @@ export default function UserDashboard() {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:3100/api/dns/getCountById/${localStorage.getItem(
+        `${baseUrl}/api/dns/getCountById/${localStorage.getItem(
           "userLoggedIn"
         )}`
       )
       .then((response) => {
         axios
           .get(
-            `http://localhost:3100/api/ticket/getUserTicket/${localStorage.getItem(
+            `${baseUrl}/api/ticket/getUserTicket/${localStorage.getItem(
               "userId"
             )}`
           )
@@ -91,7 +92,7 @@ export default function UserDashboard() {
       status: "assigned",
     };
     axios
-      .post("http://localhost:3100/api/ticket/updateTicket", updateValue)
+      .post(`${baseUrl}/api/ticket/updateTicket`, updateValue)
       .then((response) => {
         console.log(response.data);
       });

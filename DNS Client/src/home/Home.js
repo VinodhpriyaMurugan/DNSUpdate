@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { Alert, AlertTitle, Button, Grid, TextField } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Grid,
+  IconButton,
+  TextField,
+} from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import "./home.css";
 import { MenuItem, Modal } from "@material-ui/core";
+import Modify from "./Modify";
+import { baseUrl } from "../config/UrlConfig";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,6 +30,7 @@ const Home = () => {
   const [dnsNames, setDnsNames] = useState([""]);
   const [ttl, setTTL] = useState([""]);
   const [ipAddresses, setIpAddresses] = useState([""]);
+  const [targetValues, setTargetValues] = useState([""]);
   const [fqdnName, setFqdnName] = useState([""]);
   const [cNames, setCNames] = useState([""]);
   const [service, setService] = useState([""]);
@@ -32,6 +42,7 @@ const Home = () => {
   const [formVal, setFormVal] = useState([]);
   const [file, setFile] = useState("");
   const [showForm, setShowForm] = useState(true);
+  const [formValues, setFormValues] = useState([]);
   const [tId, setTid] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -52,12 +63,7 @@ const Home = () => {
     return generateRandomString(4, "TI");
   };
 
-  // const onFileChange = (event) => {
-  //   setFile(event.target.files[0]);
-  // };
-
   const uploadFile = async (value) => {
-    alert("upload file==>");
     const formData = new FormData();
     if (file) {
       formData.append("file", file);
@@ -69,7 +75,7 @@ const Home = () => {
     console.log("Form data=======>", formData);
     console.log("====================================");
     await axios
-      .post("http://localhost:3100/api/ticket/saveTickets", formData)
+      .post(`${baseUrl}/api/ticket/saveTickets`, formData)
       .then((Response) => {
         setShowAlert(true);
         setTimeout(() => {
@@ -85,6 +91,7 @@ const Home = () => {
       });
   };
   const handleFormSubmit = async (event) => {
+    alert("clicked");
     var ticketId = generateTicketId();
     console.log("ticketId", ticketId);
     setTid(ticketId);
@@ -170,9 +177,9 @@ const Home = () => {
       console.log("FINAL VALUE============>", finalValue);
 
       console.log("Forms==============>", formVal);
-      alert("ajdvjsvj");
+
       axios
-        .post("http://localhost:3100/api/dns/createDnsRecord", finalValue)
+        .post(`${baseUrl}/api/dns/createDnsRecord`, finalValue)
         .then((response) => {
           if (
             response.status === 200 &&
@@ -188,7 +195,7 @@ const Home = () => {
             }
             // Navigate to the user page
           }
-          uploadFile(ticketId); // uploading  excel file
+          uploadFile(ticketId);
           console.log("Response tickets......", response.data);
         })
         .catch((error) => {
@@ -210,8 +217,18 @@ const Home = () => {
     //  updatedDnsTypes[index] = value;
     setDnsTypes(value);
   };
-  const onActionChange = (value) => {
+  const onActionChange = async (value) => {
     setActions(value);
+    if (value === "Modify") {
+      const response = await axios.post(
+        `${baseUrl}/api/dns/getDnsRecordByUser/Dinesh@gmail.com`
+      );
+      console.log("Response", response.data);
+      setFormValues(response.data);
+      setShowForm(true); // Ensure the forms are shown
+    } else {
+      setShowForm(false); // Hide the forms for other actions
+    }
     // const updatedActions = [...actions];
     // updatedActions[index] = value;
     // setActions(updatedActions);
@@ -255,6 +272,11 @@ const Home = () => {
     const updatedIpAddresses = [...ipAddresses];
     updatedIpAddresses[index] = value;
     setIpAddresses(updatedIpAddresses);
+  };
+  const onTargetValueChange = (index, value) => {
+    const updatedTargetValue = [...targetValues];
+    updatedTargetValue[index] = value;
+    setTargetValues(updatedTargetValue);
   };
   const onFqdnName = (index, value) => {
     const updatedFqdnName = [...fqdnName];
@@ -382,9 +404,23 @@ const Home = () => {
               <Grid item xs={12} sm={4}>
                 <TextField
                   required
-                  label="CNAME"
+                  label="CNAME Target Value"
                   value={cNames[i]}
                   onChange={(event) => onCNameChange(i, event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+            )}
+            {dnsRecordTypes[i] === "TXT" && (
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  required
+                  label="Target Value"
+                  value={targetValues[i]}
+                  onChange={(event) =>
+                    onTargetValueChange(i, event.target.value)
+                  }
                   variant="outlined"
                   fullWidth
                 />
@@ -459,14 +495,41 @@ const Home = () => {
     setShowForm(false);
     setRepeatCount(repeatCount + 1);
   };
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    try {
+      let ticket = generateTicketId();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("ticket", ticket);
+      formData.append("user", localStorage.getItem("userLoggedIn"));
+      await axios.post(`${baseUrl}/api/ticket/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("File uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
   return (
     <div>
       <Navbar />
       <br />
       <div className="work-area-implemnent">
         <div className="home-container">
+          <div className="upload-div">
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload}>Upload</button>
+          </div>
+          <a href="http://localhost:3100/api/ticket/download">DownloadExcel</a>
           <div className="home-form">
             <h3 className="home-title">Create DNS Ticket</h3>
+
             <form noValidate validated={validated} onSubmit={handleFormSubmit}>
               <div className="static-container">
                 <Grid container spacing={4}>
@@ -579,22 +642,28 @@ const Home = () => {
                 </Grid>
               </div>
 
-              <div className="other-elements" hidden={showForm}>
+              <div className="others-elements" hidden={showForm}>
                 {renderRepeatedFormElements()}
               </div>
+              {formValues.length && (
+                <div className="others-elements">
+                  <Modify data={formValues} />
+                </div>
+              )}
 
-              {/* <Grid>
-                <input type="file" onChange={(e) => onFileChange(e)} />
-              </Grid> */}
-              <Grid item xs={12} className="submit-button-container">
-                <button className="add-btn" onClick={handleAdd}>
-                  Add
-                </button>
-                {"  "}
-              </Grid>
-              <button type="submit" className="submit-btn">
-                Submit
-              </button>
+              {!showForm && (
+                <>
+                  <Grid item xs={12} className="submit-button-container">
+                    <button className="add-btn" onClick={handleAdd}>
+                      Add
+                    </button>
+                    {"  "}
+                  </Grid>
+                  <button type="submit" className="submit-btn">
+                    Submit
+                  </button>{" "}
+                </>
+              )}
             </form>
           </div>
         </div>

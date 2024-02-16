@@ -3,6 +3,7 @@ import axios from "axios";
 import Select from "react-select";
 import Navbar from "../../Navbar/Navbar";
 import Department from "./Department";
+import { baseUrl } from "../../config/UrlConfig";
 
 function Branch() {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -40,7 +41,7 @@ function Branch() {
   const saveBranchesToServer = () => {
     console.log("Branches======>", branches);
     axios
-      .post("http://localhost:3100/api/component/saveBranch", branches)
+      .post(`${baseUrl}/api/component/saveBranch`, branches)
       .then((response) => {
         console.log("Branches saved successfully:", response.data);
       })

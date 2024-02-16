@@ -5,6 +5,7 @@ import countryList from "react-select-country-list";
 import Navbar from "../Navbar/Navbar";
 import "./Registration.css";
 import { useNavigate } from "react-router-dom";
+import { ErrorToastAlert, SuccessToastAlert } from "./Toast";
 const baseUrl = "http://localhost:3100";
 
 function RegistrationForm(props) {
@@ -83,7 +84,6 @@ function RegistrationForm(props) {
   };
 
   const handleDepartmentChange = (e) => {
-    alert(e.target.value);
     setDepartment(e.target.value);
   };
 
@@ -115,22 +115,20 @@ function RegistrationForm(props) {
     const userValues = {
       name,
       email,
-
       userType: userType.join(","),
       password,
       selectedRole,
-
       geo,
     };
     console.log("userValues ===============>", userValues);
     axios
       .post(`${baseUrl}/api/users/register`, userValues)
       .then(() => {
-        alert("User registered successfully!");
+        SuccessToastAlert("User registered successfully!");
       })
       .catch((error) => {
         console.error("Error registering user:", error);
-        alert("Failed to register user. Please try again.");
+        ErrorToastAlert("Failed to register user. Please try again.");
       });
   };
   const goToHome = () => {

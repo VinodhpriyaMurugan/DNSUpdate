@@ -1,2 +1,3 @@
 Zone,Name,RRType,RRData
-dfdsf,dsffd,A,fdsfsd
+TSU,www.tpf.com,CNAME,Cname.com
+TSi,www.tpf.com,A,172.16.5.72

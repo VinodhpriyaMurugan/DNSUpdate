@@ -9,12 +9,14 @@ module.exports = (app) => {
   router.get("/getAllRecord", dnsRecord.getAllRecord);
   router.get("/getDnsRecord/:ticket", dnsRecord.getDnsRecord);
   router.get("/getDnsRecordById/:id", dnsRecord.getDnsRecordById);
+  router.post("/getDnsRecordByUser/:id", dnsRecord.getDnsRecordByUser);
   router.post("/updateDnsRecord", dnsRecord.updateDnsRecord);
   router.get("/getDnsRecordByType/:type", dnsRecord.getDnsRecordByType);
   router.get("/getDnsRecordByDate/:date", dnsRecord.getDnsRecordByDate);
   router.get("/getTypeUnscheduled/:type", dnsRecord.getTypeUnscheduled);
   router.get("/getCount", dnsRecord.getCount);
   router.get("/getCountById/:user", dnsRecord.getCountByUser);
+  router.post("/updateRecord", dnsRecord.updateDnsRecordByUser);
   router.get("/runDNSByCSV", dnsRecord.runSshCSV);
   router.get(
     "/getApprovedDnsRecordByUser/:id",

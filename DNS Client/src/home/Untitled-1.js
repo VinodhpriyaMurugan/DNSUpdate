@@ -52,7 +52,6 @@ const Home = () => {
   };
 
   const uploadFile = async (value) => {
-    alert("upload file==>");
     const formData = new FormData();
     if (file) {
       formData.append("file", file);
@@ -156,7 +155,7 @@ const Home = () => {
       console.log("FINAL VALUE============>", finalValue);
 
       console.log("Forms==============>", formVal);
-      alert("ajdvjsvj");
+
       axios
         .post("http://localhost:3100/api/dns/createDnsRecord", finalValue)
         .then((response) => {

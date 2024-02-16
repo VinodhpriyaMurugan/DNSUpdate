@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../Assets/logo.png";
+import { baseUrl } from "../config/UrlConfig";
 // import {  } from 'react-router-dom'
 const Login = () => {
   localStorage.clear();
@@ -25,33 +26,34 @@ const Login = () => {
         user_name: user,
         password: pass,
       };
-      axios
-        .post("http://localhost:3100/api/users/login", loginValue)
-        .then((Response) => {
-          console.log("loginValue================>", Response.data);
-          localStorage.setItem("userId", Response.data.id);
-          localStorage.setItem("userLoggedIn", Response.data.email_id);
-          localStorage.setItem("role", Response.data.role);
-          localStorage.setItem("branch", Response.data.branch);
-          localStorage.setItem("dept", Response.data.department);
-          localStorage.setItem("user", Response.data.user_name);
-          if (localStorage.getItem("role") === "admin,user") {
-            console.log("Response.data.role", Response.data.role);
-            navigate("/admin", {
-              state: {
-                user: Response.data.user_name,
-                branch: Response.data.branch,
-                dept: Response.data.department,
-              },
-            });
-          } else if (Response.data.role === "user") {
-            navigate("/user", {
-              state: {
-                value: false,
-              },
-            });
-          }
-        });
+      axios.post(`${baseUrl}/api/users/login`, loginValue).then((Response) => {
+        console.log("loginValue================>", Response.data);
+        localStorage.setItem("userId", Response.data.id);
+        localStorage.setItem("userLoggedIn", Response.data.email_id);
+        localStorage.setItem("role", Response.data.role);
+        localStorage.setItem("branch", Response.data.branch);
+        localStorage.setItem("dept", Response.data.department);
+        localStorage.setItem("user", Response.data.user_name);
+        if (localStorage.getItem("role") === "admin,user") {
+          console.log("Response.data.role", Response.data.role);
+          navigate("/dashboard", {
+            state: { user: "Admin" },
+          });
+          // navigate("/admin", {
+          //   state: {
+          //     user: Response.data.user_name,
+          //     branch: Response.data.branch,
+          //     dept: Response.data.department,
+          //   },
+          // });
+        } else if (Response.data.role === "user") {
+          navigate("/user", {
+            state: {
+              value: false,
+            },
+          });
+        }
+      });
       // return
     }
   };
@@ -61,7 +63,7 @@ const Login = () => {
       <div className="Login">
         <div className="logo-header">
           <img src={logo} className="login-image"></img>
-          <h3 className="login-header">Dsmart</h3>
+          <h3 className="login-header">D-SMART</h3>
         </div>
 
         <Form onSubmit={handleLogin}>
@@ -91,7 +93,7 @@ const Login = () => {
           </div>
 
           <button variant="primary" className="login-submit-btn" type="submit">
-            Submit
+            Login
           </button>
         </Form>
       </div>
