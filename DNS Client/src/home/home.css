@@ -15,8 +15,11 @@
   /* margin-left: 34px; */
 }
 .upload-div {
-  position: absolute;
-  left: 80vh;
+  position: relative;
+  left: 69vh;
+  display: flex;
+  gap: 15px;
+  /* width: 58vw; */
 }
 form.forms-home {
   margin-left: 25px;
@@ -67,6 +70,7 @@ button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-contained
   height: 75vh;
   left: 10vw;
   width: 100vw;
+  top: 3vw;
 }
 button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.addFrom-btn.css-sghohy-MuiButtonBase-root-MuiButton-root {
   border: none;

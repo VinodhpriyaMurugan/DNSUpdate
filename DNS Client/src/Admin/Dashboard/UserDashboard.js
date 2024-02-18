@@ -11,12 +11,13 @@ import close from "../../Assets/close-circle-svgrepo-com.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApprovedTickets from "../../display/ApprovedTickets";
 import { baseUrl } from "../../config/UrlConfig";
+import { Button } from "@mui/material";
 export default function UserDashboard() {
   const location = useLocation();
   // const name = location.state.user.toUpperCase();
   // const branch = location.state.branch;
   // const dept = location.state.dept;
-  const show = location.state.value;
+  const show = false;
 
   const [adminValue, setAdminValue] = useState(null);
   const [adminDrop, setAdminDrop] = useState([]);
@@ -30,11 +31,7 @@ export default function UserDashboard() {
   const adminPlaceHolder = adminValue !== null ? placeValue : "Admin";
   useEffect(() => {
     axios
-      .get(
-        `${baseUrl}/api/dns/getCountById/${localStorage.getItem(
-          "userLoggedIn"
-        )}`
-      )
+      .get(`${baseUrl}/api/dns/getCountById/${localStorage.getItem("userId")}`)
       .then((response) => {
         axios
           .get(
@@ -83,7 +80,9 @@ export default function UserDashboard() {
     });
   };
   const handleCreateRecord = () => {
-    navigate("/home");
+    navigate("/home", {
+      state: { item: "Create", ticket_id: "" },
+    });
   };
   const updateTicket = () => {
     const updateValue = {
@@ -97,20 +96,43 @@ export default function UserDashboard() {
         console.log(response.data);
       });
   };
+  const handleEditClick = (rowId) => {
+    navigate("/home", {
+      state: { item: "Modify", ticket_id: rowId },
+    });
+    console.log("rowId", rowId);
+  };
   return (
     <div className="page-body">
       <Navbar />
-      <div className="content-area-user">
-        <div className="nameTag">
-          <h1>{localStorage.getItem("user").toUpperCase()}</h1>
-          <h6>
-            {localStorage.getItem("branch")}/{localStorage.getItem("dept")}
-          </h6>
+      <div className="content-area-user" style={{ zIndex: 222222 }}>
+        <div className="top-content-area-user">
+          <div className="top-content-div-user">
+            <div className="name-div">
+              <h3 style={{ color: "black", fontWeight: "bolder" }}>
+                {" "}
+                {localStorage.getItem("user").toUpperCase()}
+              </h3>{" "}
+              <button
+                className="create-btn"
+                onClick={handleCreateRecord}
+                style={{ color: "black", fontWeight: "bolder" }}
+              >
+                Create Record
+              </button>
+              <a
+                href={`${baseUrl}/api/ticket/downloadExcel`}
+                download="output.xlsx"
+              >
+                DownloadExcel
+              </a>
+            </div>
+          </div>
         </div>
-
-        {/* <button className="create-btn" onClick={handleCreateRecord}>
-          Create Record
-        </button> */}
+        {/* <div className="nameTag">
+          <h1>{localStorage.getItem("user").toUpperCase()}</h1>
+        </div>
+        <button onClick={handleCreateRecord}>Create Record</button> */}
         {!show && countInfo && (
           <div className="data-div">
             <div className="count-div">
@@ -151,6 +173,8 @@ export default function UserDashboard() {
                     <th>DNS Type</th>
                     <th>Record Type</th>
                     <th>Status</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,6 +188,22 @@ export default function UserDashboard() {
                       <td>{user.details.dns_type}</td>
                       <td>{user.details.dns_record_type}</td>
                       <td>{user.ticket.ticket_status}</td>
+                      <td>{user.ticket.remarks || "Created"}</td>
+                      <td>
+                        <button
+                          style={{ margin: 0 }}
+                          className="btn btn-primary btn-sm"
+                          onClick={() => {
+                            console.log(
+                              "Review button clicked for ticket ID:",
+                              user.ticket.ticket_id
+                            );
+                            handleEditClick(user.ticket.ticket_id);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

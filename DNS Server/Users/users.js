@@ -17,8 +17,7 @@ exports.create = (req, res) => {
         user_name: req.body.name,
         password: req.body.password,
         // user_id: req.body.userId,
-        department: "dept",
-        branch: "branch",
+
         role: req.body.userType,
         email_id: req.body.email,
         role_type: req.body.selectedRole,
@@ -120,7 +119,7 @@ exports.getByRole = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-
+  console.log("IIIDDDDDDDDDDDDDd=====>", id);
   Users.findByPk(id)
     .then((data) => {
       if (data) {

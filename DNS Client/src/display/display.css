@@ -15,20 +15,20 @@ button.btn.btn-primary {
   height: 28px;
   padding: 0px;
   width: 80px;
-  margin: 0 10px;
+  margin: 25px 10px;
 }
 .modal-div {
   position: absolute;
-  width: 800px;
-  height: 350px;
-  background-color: #066550ed;
-  border-radius: 20px;
-  top: 25vh;
-  left: 20vw;
+  width: 42vw;
+  height: 85vh;
+  background-color: #deefe7ed;
+  border-radius: 10px;
+  top: 0;
+  left: 52vw;
 }
 .value-div {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 }
 input.dateTypeDiv {
   width: 10vw;
@@ -38,7 +38,7 @@ input.dateTypeDiv {
   outline: none;
 }
 h4.viewTags {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: #acb0af;
 }
@@ -51,8 +51,8 @@ button.viewTag-btn {
   background-color: #0acdaa;
 }
 p.viewValue {
-  color: white;
-  font-size: 12px;
+  color: black;
+  font-size: 16px;
 }
 .viewDiv {
   margin-left: 65px;
@@ -72,13 +72,25 @@ p.viewValue {
   font-family: "rfont" !important;
   font-weight: bolder !important;
 }
-button.implement-display-btn {
+/* button.implement-display-btn {
   width: 250px;
   height: 45px;
   outline: none;
   border: none;
   background-color: #089078;
   border-radius: 4px;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  box-shadow: 0px 8px 7px 0px #295147, 0px 1px 1px 0px rgb(177 177 177 / 14%),
+    0px 1px 3px 0px rgb(0 0 0 / 12%);
+} */
+
+button.implement-display-btn {
+  /* width: 191px; */
+  /* height: 45px; */
+  /* outline: none; */
+  border: none;
+  background-color: #089078;
+  border-radius: 15px;
   transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   box-shadow: 0px 8px 7px 0px #295147, 0px 1px 1px 0px rgb(177 177 177 / 14%),
     0px 1px 3px 0px rgb(0 0 0 / 12%);
@@ -107,8 +119,14 @@ h4.ticketTag {
   top: 50%;
   left: 0px;
   transform: translateY(-50%);
-  color: white;
+  color: #acb0af;
   pointer-events: none;
   opacity: 2 !important;
-  background-color: #176f56 !important;
+  background-color: #e0f0e9 !important;
+  font-weight: 600;
+  font-size: 12px;
+}
+.MuiFormControl-root.MuiTextField-root.remarks {
+  position: absolute;
+  left: 1vw;
 }

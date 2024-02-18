@@ -30,12 +30,10 @@ export default function ApprovedTickets() {
       setColumns([
         { field: "id", headerName: "ID", width: 50 },
         { field: "dns_type", headerName: "DNS_TYPE", width: 150 },
-        { field: "scheduled_on", headerName: "Scheduled", width: 150 },
+
         { field: "status", headerName: "Status", width: 200 },
         { field: "action", headerName: "Action", width: 150 },
-        { field: "zone_name", headerName: "Zone Name", width: 200 },
-        { field: "service_tier", headerName: "Service Tier", width: 200 },
-        { field: "testing_mode", headerName: "Testing Mode", width: 200 },
+
         { field: "ticket_id", headerName: "Ticket_id", width: 200 },
         { field: "user", headerName: "Created By", width: 200 },
 
@@ -47,6 +45,12 @@ export default function ApprovedTickets() {
     fetchData();
   }, []);
   const gotoHome = () => {
+    if (localStorage.getItem("role") === "user") {
+      navigate("/user", {
+        state: { value: false },
+      });
+    } else {
+    }
     navigate("/dashboard", {
       state: { user: "admin" },
     });

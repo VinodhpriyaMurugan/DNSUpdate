@@ -11,116 +11,127 @@ require("dotenv").config({ path: "./../.env" });
 const exceljs = require("exceljs");
 
 // Define a route to handle Excel file download
-exports.downloadExcel = async (req, res) => {
-  try {
-    // Create a new workbook
-    const workbook = new exceljs.Workbook();
-    const worksheet = workbook.addWorksheet("DNS Records");
 
-    // Define the headers
-    const headers = [
-      "dns_type",
-      "action",
-      "dns_record_type",
-      "date",
-      "dns_name",
-      "ip_address",
-      "fqdn_name",
-      "service",
-      "protocol",
-      "domain",
-      "weight",
-      "port_no",
-      "priority",
-      "domain_name",
-      "zone_name",
-      "c_name",
-      "service_tier",
-      "testing_mode",
-      "description",
-      "ticket_id",
-      "user",
-      "scheduled_on",
-      "status",
-    ];
+// exports.uploadFile = async (req, res) => {
+//   try {
+//     // if (!req.file) {
+//     //   return res.status(400).send("No file uploaded.");
+//     // }
+//     const newTicket = {
+//       user_id: 1,
+//       ticket_id: req.body.ticket,
+//       ticket_status: "Pending",
+//       file_name: "fileName",
+//     };
 
-    // Add headers to the worksheet
-    worksheet.addRow(headers);
+//     // Create ticket
+//     const ticket = await Tickets.create(newTicket);
+//     console.log("Ticket created:", ticket);
+//     const workbook = new exceljs.Workbook();
+//     await workbook.xlsx.readFile(req.file.path);
 
-    // Set up the HTTP response headers
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      'attachment; filename="dns_records.xlsx"'
-    );
+//     // Assuming the first worksheet contains the data
+//     const worksheet = workbook.getWorksheet(1);
+//     // Iterate through rows and update the database
+//     await Promise.all(
+//       worksheet.eachRow(async (row, rowNumber) => {
+//         if (rowNumber > 1) {
+//           // Skip header row
+//           const rowData = row.values;
+//           // Update database using Sequelize
+//           await dnsRecords.create({
+//             // Update the fields with the data from the Excel file
+//             dns_type: rowData[1],
+//             action: rowData[2],
+//             dns_record_type: rowData[3],
+//             dns_name: rowData[5],
+//             ip_address: rowData[6],
+//             fqdn_name: rowData[7],
+//             service: rowData[8],
+//             protocol: rowData[9],
+//             domain: rowData[10],
+//             weight: rowData[11],
+//             port_no: rowData[12],
+//             priority: rowData[13],
+//             domain_name: rowData[14],
+//             zone_name: rowData[15],
+//             c_name: rowData[16],
+//             service_tier: rowData[17],
+//             testing_mode: rowData[18],
+//             description: rowData[19],
+//             ticket_id: req.body.ticket,
+//             user: req.body.user,
+//           });
+//         }
+//       })
+//     );
 
-    // Write the workbook to the response
-    await workbook.xlsx.write(res);
-
-    // End the response
-    res.end();
-  } catch (error) {
-    console.error("Error creating Excel file:", error);
-    return res.status(500).send("Internal server error.");
-  }
-};
+//     return res.status(200).send("Excel file uploaded and data updated.");
+//   } catch (error) {
+//     console.error("Error processing file:", error);
+//     return res.status(500).send("Internal server error.");
+//   }
+// };
 
 exports.uploadFile = async (req, res) => {
   try {
-    // if (!req.file) {
-    //   return res.status(400).send("No file uploaded.");
-    // }
+    // Check if file is uploaded
+    if (!req.file) {
+      return res.status(400).send("No file uploaded.");
+    }
+    console.log("ticket value", req.body);
+    // Define the new ticket object
     const newTicket = {
-      user_id: 1,
+      user_id: req.body.user_id,
       ticket_id: req.body.ticket,
       ticket_status: "Pending",
-      file_name: "fileName",
+      file_name: req.file.originalname,
+      remarks: "",
     };
 
-    // Create ticket
+    // Create the ticket
     const ticket = await Tickets.create(newTicket);
     console.log("Ticket created:", ticket);
-    const workbook = new exceljs.Workbook();
-    await workbook.xlsx.readFile(req.file.path);
 
-    // Assuming the first worksheet contains the data
-    const worksheet = workbook.getWorksheet(1);
-    // Iterate through rows and update the database
-    await Promise.all(
-      worksheet.eachRow(async (row, rowNumber) => {
-        if (rowNumber > 1) {
-          // Skip header row
-          const rowData = row.values;
-          // Update database using Sequelize
-          await dnsRecords.create({
-            // Update the fields with the data from the Excel file
-            dns_type: rowData[1],
-            action: rowData[2],
-            dns_record_type: rowData[3],
-            dns_name: rowData[5],
-            ip_address: rowData[6],
-            fqdn_name: rowData[7],
-            service: rowData[8],
-            protocol: rowData[9],
-            domain: rowData[10],
-            weight: rowData[11],
-            port_no: rowData[12],
-            priority: rowData[13],
-            domain_name: rowData[14],
-            zone_name: rowData[15],
-            c_name: rowData[16],
-            service_tier: rowData[17],
-            testing_mode: rowData[18],
-            description: rowData[19],
-            ticket_id: req.body.ticket,
-            user: req.body.user,
-          });
-        }
-      })
-    );
+    // Read data from the uploaded Excel file
+    const workbook = XLSX.readFile(req.file.path);
+    const sheetNames = workbook.SheetNames;
+
+    // Iterate through each sheet and update the database
+    sheetNames.forEach((sheetName) => {
+      const worksheet = workbook.Sheets[sheetName];
+      const sheetData = XLSX.utils.sheet_to_json(worksheet);
+      console.log("ROW data", sheetData);
+      // Iterate through each row of the sheet data and update the database
+      sheetData.forEach(async (rowData) => {
+        await dnsRecords.create({
+          dns_type: "create",
+          action: rowData.action || "",
+          dns_record_type: sheetName,
+          dns_name: rowData.dns_name || "",
+          ip_address: rowData.ip_address || "",
+          fqdn_name: rowData.fqdn_name || "",
+          service: rowData.service || "",
+          protocol: rowData.protocol || "",
+          domain: rowData.domain || "",
+          weight: rowData.weight || "",
+          port_no: rowData.port_no || "",
+          priority: rowData.priority || "",
+          domain_name: rowData.domain_name || "",
+          zone_name: rowData.zone_name || "",
+          c_name: rowData.c_name || "",
+          service_tier: rowData.service_tier || "",
+          testing_mode: rowData.testing_mode || "",
+          description: rowData.description || "",
+          ticket_id: req.body.ticket || "",
+          user: req.body.user || "",
+          remarks: "",
+        });
+      });
+    });
+
+    // Remove the uploaded file
+    fs.unlinkSync(req.file.path);
 
     return res.status(200).send("Excel file uploaded and data updated.");
   } catch (error) {
@@ -386,7 +397,6 @@ exports.getUserTickets = (req, res) => {
   Tickets.findAll({
     where: {
       user_id: req.params.id,
-      ticket_status: "Pending",
     },
   })
 
@@ -402,11 +412,13 @@ exports.getUserTickets = (req, res) => {
             },
           })
           .then((ticketDetails) => {
+            console.log("ticket details=============>", ticketDetails);
             // Combine the ticket and ticket details data
             const result = tickets.map((ticket) => {
               const matchingTicketDetails = ticketDetails.find(
                 (detail) => detail.ticket_id === ticket.ticket_id
               );
+              console.log("Matching  tickets", matchingTicketDetails);
               return {
                 ticket,
                 details: matchingTicketDetails || null,
@@ -478,28 +490,99 @@ exports.searchByTickets = (req, res) => {
     });
 };
 
-exports.downloadFile = (req, res) => {
-  console.log(req.params);
+const XLSX = require("xlsx");
 
-  const { fileName } = req.params;
-  const customerDirectory = path.join(basePath);
-  const filePath = path.join(customerDirectory, fileName);
+exports.downloadExcel = (req, res) => {
+  console.log(
+    "path------------------------",
+    path.join(__dirname, "output.xlsx")
+  );
+  const filePath = path.join(__dirname, "output.xlsx"); // Path to the Excel file on the server
 
-  fs.stat(filePath, (err, stats) => {
-    if (err) {
-      console.error(`Error getting file stats for ${fileName}:`, err);
-      return res.status(500).json({ error: "Error getting file stats" });
-    }
+  // Check if the file exists
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("File not found");
+  }
 
-    res.set({
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": `attachment; filename="${encodeURIComponent(
-        fileName
-      )}"`,
-      "Content-Length": stats.size,
-    });
-
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
+  // Set response headers
+  res.set({
+    "Content-Type": "application/octet-stream",
+    "Content-Disposition": 'attachment; filename="output.xlsx"', // Specify the file name
   });
+
+  // Send the file as a response
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
 };
+exports.downloadFile = (req, res) => {
+  console.log("Downloading file");
+  // Define column headers for each sheet
+  const columns = {
+    MX: ["zone_name", "dns_name", "ttl", "fqdn_name"],
+    SRV: [
+      "zone_name",
+      "dns_name",
+      "ttl",
+      "service",
+      "protocol",
+      "port",
+      "priority",
+      "weight",
+    ],
+    TXT: ["zone_name", "dns_name", "ttl", "target_value"],
+    A: ["zone_name", "dns_name", "ttl", "ip_address"],
+    AAAA: ["zone_name", "dns_name", "ttl", "ip_address"],
+    CNAME: ["zone_name", "dns_name", "ttl", "ip_address", "cname_target_value"],
+  };
+
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Iterate over each sheet and add data
+  Object.entries(columns).forEach(([sheetName, columnHeaders]) => {
+    // Create a new worksheet
+    const ws = XLSX.utils.aoa_to_sheet([columnHeaders]);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+  });
+
+  // Convert the workbook to a binary Excel file
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+  // Set response headers
+  res.set({
+    "Content-Type": "application/octet-stream",
+    "Content-Disposition": 'attachment; filename="output.xlsx"', // Set the file name here
+    "Content-Length": excelBuffer.length,
+  });
+
+  // Send the Excel file content as response
+  res.send(Buffer.from(excelBuffer));
+};
+
+// exports.downloadFile = (req, res) => {
+//   console.log(req.params);
+
+//   const { fileName } = req.params;
+//   const customerDirectory = path.join(basePath);
+//   const filePath = path.join(customerDirectory, fileName);
+
+//   fs.stat(filePath, (err, stats) => {
+//     if (err) {
+//       console.error(`Error getting file stats for ${fileName}:`, err);
+//       return res.status(500).json({ error: "Error getting file stats" });
+//     }
+
+//     res.set({
+//       "Content-Type": "application/octet-stream",
+//       "Content-Disposition": `attachment; filename="${encodeURIComponent(
+//         fileName
+//       )}"`,
+//       "Content-Length": stats.size,
+//     });
+
+//     const fileStream = fs.createReadStream(filePath);
+//     fileStream.pipe(res);
+//   });
+// };

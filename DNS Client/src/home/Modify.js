@@ -3,6 +3,8 @@ import { Alert, AlertTitle, Button, Grid, TextField } from "@mui/material";
 import { MenuItem, Modal } from "@material-ui/core";
 import axios from "axios";
 import { baseUrl } from "../config/UrlConfig";
+import { SuccessToastAlert } from "../Admin/Toast";
+import { useNavigate } from "react-router-dom";
 const Modify = ({ data }) => {
   const [formValue, setFormValues] = useState(data);
   const onDnsRecordChange = (index, value) => {
@@ -30,9 +32,11 @@ const Modify = ({ data }) => {
   };
 
   const onTTLChange = (index, value) => {
+    alert(value);
     setFormValues((prevFormValues) => {
       const updatedFormValues = [...prevFormValues];
       updatedFormValues[index].ttl = value;
+      console.log("updatedFormValues", updatedFormValues);
       return updatedFormValues;
     });
   };
@@ -108,14 +112,22 @@ const Modify = ({ data }) => {
       return updatedFormValues;
     });
   };
+  const navigate = useNavigate();
+  const handleHome = () => {
+    navigate("/user", {
+      state: { value: "false" },
+    });
+  };
   const handleFormSubmit = async () => {
     try {
       const response = await axios.post(
         `${baseUrl}/api/dns/updateRecord`,
         formValue
       );
-
-      console.log("Form submitted successfully");
+      SuccessToastAlert("File uploaded successfully");
+      navigate("/user", {
+        state: { value: "false" },
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -297,7 +309,7 @@ const Modify = ({ data }) => {
     <>
       {renderRepeatedFormElements()}
       <Button variant="contained" color="primary" onClick={handleFormSubmit}>
-        Submit
+        Update
       </Button>
     </>
   );

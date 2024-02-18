@@ -4,6 +4,7 @@ const { NodeSSH } = require("node-ssh");
 const DNS_Runner = {};
 const db = require("../DB_Models/index");
 const DNSRecord = db.dns_records;
+const Ticket = db.ticket_records;
 const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const { Op } = require("sequelize");
 const today = new Date();
@@ -334,7 +335,7 @@ DNS_Runner.getDnsRecordByUser = async (req, res) => {
   console.log("inside get dns by type", req.params.id);
   DNSRecord.findAll({
     where: {
-      user: req.params.id,
+      ticket_id: req.params.id,
     },
   })
     .then((result) => {
@@ -401,12 +402,35 @@ DNS_Runner.updateDnsRecord = async (req, res) => {
     res.status(500).json("Updating failed !!!!");
   }
 };
+DNS_Runner.updateTicketStatus = async (req, res) => {
+  try {
+    // Update DNSRecord
+    const affectedRowsDNSRecord = await DNSRecord.update(
+      { status: req.body.status, remarks: req.body.remarks || "" },
+      { where: { ticket_id: req.body.id } }
+    );
+
+    // Update ticket_record
+    const affectedRowsTicketRecord = await Ticket.update(
+      { ticket_status: req.body.status, remarks: req.body.remarks || "" },
+      { where: { ticket_id: req.body.id } }
+    );
+
+    console.log("Affected rows in DNSRecord:", affectedRowsDNSRecord);
+    console.log("Affected rows in ticket_record:", affectedRowsTicketRecord);
+
+    res.status(200).json("Updated ticket Status");
+  } catch (error) {
+    console.error("Error updating records:", error);
+    res.status(500).json(error);
+  }
+};
 DNS_Runner.updateDnsRecordByUser = async (req, res) => {
   try {
-    const dataArray = req.body; // Assuming req.body is the array of objects
+    const dataArray = req.body;
 
-    // Loop through the array and update records
     for (const data of dataArray) {
+      console.log("data=====>>>>>", data);
       const {
         id,
         dns_type,
@@ -420,6 +444,8 @@ DNS_Runner.updateDnsRecordByUser = async (req, res) => {
         protocol,
         domain,
         weight,
+        ttl,
+        target_value,
         port_no,
         priority,
         domain_name,
@@ -447,6 +473,8 @@ DNS_Runner.updateDnsRecordByUser = async (req, res) => {
           protocol,
           domain,
           weight,
+          ttl,
+          target_value,
           port_no,
           priority,
           domain_name,
@@ -458,7 +486,7 @@ DNS_Runner.updateDnsRecordByUser = async (req, res) => {
           ticket_id,
           user,
           scheduled_on,
-          status,
+          status: "Pending",
         },
         { where: { id } }
       );
@@ -479,26 +507,26 @@ DNS_Runner.getAllRecord = async (req, res) => {
 };
 DNS_Runner.getCount = async (req, res) => {
   console.log("getcount method");
-  const create = await DNSRecord.count({
+  const create = await db.ticket_records.count({
     where: {
-      status: "Approved",
+      ticket_status: "Approved",
     },
   });
-  const scheduled = await DNSRecord.count({
+
+  const scheduled = await db.ticket_records.count({
     where: {
-      status: "Approved",
-      scheduled_on: {
-        [Op.lte]: today,
-      },
-      // Replace with your desired WHERE condition
+      ticket_status: "Reject",
+      // scheduled_on: {
+      //   [Op.lte]: today,
+      // },
     },
   });
-  const modify = await DNSRecord.count({
+  const modify = await db.ticket_records.count({
     where: {
-      status: "Pending", // Replace with your desired WHERE condition
+      ticket_status: "Pending", // Replace with your desired WHERE condition
     },
   });
-  const totalCount = await DNSRecord.count();
+  const totalCount = await db.ticket_records.count();
   const countValues = {
     approved: create,
     pending: modify,
@@ -511,21 +539,21 @@ DNS_Runner.getCount = async (req, res) => {
 };
 
 DNS_Runner.getCountByUser = async (req, res) => {
-  const create = await DNSRecord.count({
+  const create = await db.ticket_records.count({
     where: {
-      user: req.params.user,
+      user_id: req.params.user,
     },
   });
-  const modify = await DNSRecord.count({
+  const modify = await db.ticket_records.count({
     where: {
-      user: req.params.user,
-      status: "Approved", // Replace with your desired WHERE condition
+      user_id: req.params.user,
+      ticket_status: "Approved", // Replace with your desired WHERE condition
     },
   });
-  const deleteTicket = await DNSRecord.count({
+  const deleteTicket = await db.ticket_records.count({
     where: {
-      user: req.params.user,
-      status: "Pending", // Replace with your desired WHERE condition
+      user_id: req.params.user,
+      ticket_status: "Pending", // Replace with your desired WHERE condition
     },
   });
   const totalCount = await DNSRecord.count();

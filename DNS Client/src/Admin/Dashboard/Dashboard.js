@@ -88,7 +88,9 @@ export default function Dashboard() {
     navigate("/implement");
   };
   const handleCreateRecord = () => {
-    navigate("/home");
+    navigate("/home", {
+      state: { item: "Create", ticket_id: "" },
+    });
   };
   const handleSearch = (e) => {
     console.log(e);
@@ -127,9 +129,6 @@ export default function Dashboard() {
             className="search-btn"
             onChange={(e) => handleSearch(e.target.value)}
           />
-          {/* <button className="implement-btn" onClick={handleImplementBtn}>
-            Implement by category
-          </button> */}
         </div>
       </div>
       <div className="content-area">
@@ -156,6 +155,7 @@ export default function Dashboard() {
                 <h1 className="countTag" text-align="center">
                   {countInfo.pending}
                 </h1>
+
                 <h6 className="countLabel">Pending</h6>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function Dashboard() {
                 <h1 className="countTag" text-align="center">
                   {countInfo.scheduled}
                 </h1>
-                <h6 className="countLabel">Scheduled</h6>
+                <h6 className="countLabel">Rejected</h6>
               </div>
             </div>
           </div>
@@ -177,10 +177,10 @@ export default function Dashboard() {
                 <thead>
                   <tr>
                     <th>S.no</th>
-                    <th>Req_date</th>
-                    <th>Req_id</th>
                     <th>Requested_user</th>
-
+                    <th>Req_id</th>
+                    <th>Status</th>
+                    <th>Req_date</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -188,35 +188,15 @@ export default function Dashboard() {
                   {userInfo.map((user, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{user.user.createdAt}</td>
-                      <td>{user.ticket_id}</td>
                       <td>{user.user.user_name}</td>
-
-                      {/* <td>
-                        {user.user.createdAt
-                          ? Math.ceil(
-                              Math.abs(
-                                new Date() -
-                                  moment(user.user.createdAt).format(
-                                    "DD-MMM-YYYY"
-                                  )
-                              ) /
-                                (1000 * 3600 * 24)
-                            )
-                          : ""}
-                      </td> */}
-                      {/* <td>
-                        <button
-                          className="btn btn-primary btn-sm"
-                          onClick={() => handleForwardBtn(user.ticket_id)}
-                        >
-                          Forward
-                        </button>
-                      </td> */}
+                      <td>{user.ticket_id}</td>
+                      <td>{user.status}</td>
+                      <td>{moment(user.user.createdAt).format("DD-MMM-YY")}</td>
                       <td>
                         <button
                           className="btn btn-primary btn-sm"
                           onClick={() => handleViewBtn(user.ticket_id)}
+                          style={{ margin: 0 }}
                         >
                           Review
                         </button>
@@ -226,7 +206,18 @@ export default function Dashboard() {
                 </tbody>
               </table>
             )}
-
+            {userInfo.length === 0 && (
+              <h6
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "25px",
+                }}
+              >
+                No data found
+              </h6>
+            )}
             {showSearch && (
               <table className="table table-striped">
                 <thead>

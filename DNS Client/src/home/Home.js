@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   AlertTitle,
@@ -8,15 +8,18 @@ import {
   TextField,
 } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import "./home.css";
 import { MenuItem, Modal } from "@material-ui/core";
 import Modify from "./Modify";
 import { baseUrl } from "../config/UrlConfig";
+import { SuccessToastAlert } from "../Admin/Toast";
 
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const item = location.state.item;
   const [repeatCount, setRepeatCount] = useState(0);
   const [createCount, setCreateCount] = useState(0);
   const [modifyCount, setModifyCount] = useState(0);
@@ -113,6 +116,8 @@ const Home = () => {
         weight,
         priority,
         port,
+        ttl,
+        targetValues,
       };
       let finalValue = [];
       for (var i = 0; i < repeatCount; i++) {
@@ -171,6 +176,8 @@ const Home = () => {
           user: localStorage.getItem("userLoggedIn"),
           scheduled_on: null,
           status: "Pending",
+          ttl: ttl,
+          target_value: targetValues,
         };
       }
       setFormVal(finalValue);
@@ -185,6 +192,10 @@ const Home = () => {
             response.status === 200 &&
             response.data === "Record created successfully"
           ) {
+            SuccessToastAlert("File uploaded successfully");
+            navigate("/user", {
+              state: { value: "false" },
+            });
             if (file) {
             } else {
               navigate("/user", {
@@ -195,7 +206,7 @@ const Home = () => {
             }
             // Navigate to the user page
           }
-          uploadFile(ticketId);
+          // uploadFile(ticketId);
           console.log("Response tickets......", response.data);
         })
         .catch((error) => {
@@ -217,11 +228,23 @@ const Home = () => {
     //  updatedDnsTypes[index] = value;
     setDnsTypes(value);
   };
+  useEffect(() => {
+    async function modifyUserData() {
+      const response = await axios.post(
+        `${baseUrl}/api/dns/getDnsRecordByUser/${location.state.ticket_id}`
+      );
+      setFormValues(response.data);
+      setShowForm(true);
+    }
+    if (item === "Modify") {
+      modifyUserData();
+    }
+  }, []);
   const onActionChange = async (value) => {
     setActions(value);
     if (value === "Modify") {
       const response = await axios.post(
-        `${baseUrl}/api/dns/getDnsRecordByUser/Dinesh@gmail.com`
+        `${baseUrl}/api/dns/getDnsRecordByUser/${location.state.ticket_id}`
       );
       console.log("Response", response.data);
       setFormValues(response.data);
@@ -498,7 +521,19 @@ const Home = () => {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
-
+  const handleHome = () => {
+    if (localStorage.getItem("role") === "user") {
+      navigate("/user", {
+        state: { value: "false" },
+      });
+    } else {
+      navigate("/dashboard", {
+        state: {
+          user: "admin",
+        },
+      });
+    }
+  };
   const handleUpload = async () => {
     try {
       let ticket = generateTicketId();
@@ -506,10 +541,15 @@ const Home = () => {
       formData.append("file", file);
       formData.append("ticket", ticket);
       formData.append("user", localStorage.getItem("userLoggedIn"));
+      formData.append("user_id", localStorage.getItem("userId"));
       await axios.post(`${baseUrl}/api/ticket/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+      });
+      SuccessToastAlert("File uploaded successfully");
+      navigate("/user", {
+        state: { value: "false" },
       });
       console.log("File uploaded successfully.");
     } catch (error) {
@@ -521,12 +561,32 @@ const Home = () => {
       <Navbar />
       <br />
       <div className="work-area-implemnent">
+        <Button variant="contained" color="primary" onClick={handleHome}>
+          Home
+        </Button>
+        <div className="upload-div">
+          <a
+            href="http://localhost:3100/api/ticket/downloadExcel"
+            download="output.xlsx"
+          >
+            DownloadExcel
+          </a>
+          <input type="file" onChange={handleFileChange} />
+          <button
+            onClick={handleUpload}
+            style={{
+              width: "5vw",
+              height: "3vh",
+              bordeRadius: "5px",
+              border: "none",
+              backgroundColor: "dodgerblue",
+              color: "white",
+            }}
+          >
+            Upload
+          </button>
+        </div>
         <div className="home-container">
-          <div className="upload-div">
-            <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>Upload</button>
-          </div>
-          <a href="http://localhost:3100/api/ticket/download">DownloadExcel</a>
           <div className="home-form">
             <h3 className="home-title">Create DNS Ticket</h3>
 

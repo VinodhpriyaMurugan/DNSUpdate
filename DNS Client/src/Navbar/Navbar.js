@@ -18,7 +18,9 @@ export default function Navbar() {
     navigate("/");
   };
   const handleImplementBtn = () => {
-    navigate("/implement");
+    navigate("/user", {
+      state: { value: false },
+    });
   };
   const handleHome = () => {
     navigate("/dashboard", {
@@ -65,35 +67,35 @@ export default function Navbar() {
             <div className="side-bar-components">
               {/* <img className="admin-img" src={userImg} alt=""></img> */}
               <div className="page-components">
-                <button
+                {/* <button
                   className="logout-btn"
-                  onClick={handleCreate}
+                  onClick={getAllApproved}
                   title="Create Record"
                 >
                   <img className="admin-img" src={userImg} alt=""></img>
-                </button>
+                </button> */}
 
-                <button
+                {/* <button
                   className="logout-btn"
                   onClick={handleCreate}
                   title="Create Record"
                 >
                   <img className="navbar-buttons" src={create}></img>
-                </button>
+                </button> */}
 
-                <button
+                {/* <button
                   className="logout-btn"
                   onClick={getAllApproved}
                   title="Records"
                 >
                   <img className="navbar-buttons" src={record}></img>
-                </button>
+                </button> */}
               </div>
-              <div className="logout-div">
+              {/* <div className="logout-div">
                 <button className="logout-btn">
                   <img src={settings} alt="" className="settings-btn"></img>
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         ) : (
@@ -111,7 +113,7 @@ export default function Navbar() {
                 <button
                   className="logout-btn"
                   onClick={handleImplementBtn}
-                  title="Implementation"
+                  title="My Records"
                 >
                   <img className="navbar-buttons" src={Implement}></img>
                 </button>
@@ -122,13 +124,13 @@ export default function Navbar() {
                 >
                   <img className="navbar-buttons" src={create}></img>
                 </button>
-                <button
+                {/* <button
                   className="logout-btn"
                   onClick={handleComponent}
                   title="Component"
                 >
                   <img src={settings} alt="" className="settings-btn"></img>
-                </button>
+                </button> */}
               </div>
               {/* <div className="logout-div">
                 <button className="logout-btn">

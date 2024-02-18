@@ -17,6 +17,9 @@ module.exports = (sequelize, Sequelize) => {
     file_name: {
       type: Sequelize.STRING,
     },
+    remarks: {
+      type: Sequelize.STRING,
+    },
   });
   return Ticket_id;
 };

@@ -34,7 +34,7 @@ const Login = () => {
         localStorage.setItem("branch", Response.data.branch);
         localStorage.setItem("dept", Response.data.department);
         localStorage.setItem("user", Response.data.user_name);
-        if (localStorage.getItem("role") === "admin,user") {
+        if (localStorage.getItem("role").includes("admin")) {
           console.log("Response.data.role", Response.data.role);
           navigate("/dashboard", {
             state: { user: "Admin" },

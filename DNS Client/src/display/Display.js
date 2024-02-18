@@ -5,8 +5,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./display.css";
 import Navbar from "../Navbar/Navbar";
-import { Box, Checkbox, Modal } from "@material-ui/core";
-import { DataGrid, GridCheckboxSelectionModel } from "@mui/x-data-grid";
+import {
+  Box,
+  Checkbox,
+  Grid,
+  Icon,
+  Modal,
+  TextField,
+  Typography,
+} from "@material-ui/core";
+import {
+  DataGrid,
+  GridCheckboxSelectionModel,
+  GridCloseIcon,
+} from "@mui/x-data-grid";
 import moment from "moment";
 import { ErrorToastAlert, SuccessToastAlert } from "../Admin/Toast";
 import { baseUrl } from "../config/UrlConfig";
@@ -28,7 +40,8 @@ export default function Display() {
   const [showDate, setShowDate] = useState(true);
   const [scheduleTag, setScheduleTag] = useState("Schedule on");
   const [reschedule, setReschedule] = useState(false);
-
+  const [showRemarks, setShowRemarks] = useState(true);
+  const [remarks, setRemarks] = useState("");
   const navigate = useNavigate();
   const runDns = (id) => {
     console.log("Run Dns Id", id);
@@ -43,55 +56,55 @@ export default function Display() {
   };
   useEffect(() => {
     console.log("inside use effect");
-    const fetchData = async () => {
-      let allResponse = await axios.get(
-        `${baseUrl}/api/dns/getDnsRecord/${ticket}`
-      );
-      let response = await axios.get(
-        `${baseUrl}/api/dns/getCreateActionDnsRecord`
-      );
 
-      console.log("allResponse.data", allResponse.data);
-      setJsonTableData(allResponse.data);
-
-      setRows(allResponse.data);
-
-      setColumns([
-        { field: "id", headerName: "ID", width: 50 },
-        { field: "dns_type", headerName: "DNS_TYPE" },
-        { field: "action", headerName: "Action" },
-        { field: "zone_name", headerName: "Zone Name" },
-        { field: "service_tier", headerName: "Service Tier" },
-        { field: "testing_mode", headerName: "Testing Mode" },
-        { field: "ticket_id", headerName: "Ticket_id" },
-        { field: "user", headerName: "Created By" },
-        { field: "dns_name", headerName: "R Status" },
-        {
-          field: "",
-          headerName: "Actions",
-          description: "This column has a value getter and is not sortable.",
-          sortable: false,
-          width: 130,
-          renderCell: (params) => (
-            <Button className="implement-display-btn" onClick={handleRowClick}>
-              View
-            </Button>
-            // <Button
-            //   src={downloadBtn}
-            //   alt="Unable to Fetch Link"
-            //   style={{ height: "20%", width: "20%" }}
-            // />
-          ),
-        },
-      ]);
-      // const headers = Object.keys(response.data[0]);
-      // setTableDataToDisplay(headers);
-      // console.log(headers);
-    };
     fetchData();
   }, []);
+  const fetchData = async () => {
+    let allResponse = await axios.get(
+      `${baseUrl}/api/dns/getDnsRecord/${ticket}`
+    );
+    let response = await axios.get(
+      `${baseUrl}/api/dns/getCreateActionDnsRecord`
+    );
+
+    console.log("allResponse.data", allResponse.data);
+    setJsonTableData(allResponse.data);
+
+    setRows(allResponse.data);
+
+    setColumns([
+      { field: "id", headerName: "ID", width: 50 },
+      { field: "dns_type", headerName: "DNS_TYPE" },
+      { field: "action", headerName: "Action" },
+      { field: "zone_name", headerName: "Zone Name" },
+      { field: "service_tier", headerName: "Service Tier" },
+      { field: "testing_mode", headerName: "Testing Mode" },
+      { field: "ticket_id", headerName: "Ticket_id" },
+      { field: "user", headerName: "Created By" },
+      { field: "dns_name", headerName: "R Status" },
+      {
+        field: "",
+        headerName: "Actions",
+        description: "This column has a value getter and is not sortable.",
+        sortable: false,
+        width: 130,
+        renderCell: (params) => (
+          <Button className="implement-display-btn" onClick={handleRowClick}>
+            View
+          </Button>
+          // <Button
+          //   src={downloadBtn}
+          //   alt="Unable to Fetch Link"
+          //   style={{ height: "20%", width: "20%" }}
+          // />
+        ),
+      },
+    ]);
+    // const headers = Object.keys(response.data[0]);
+    // setTableDataToDisplay(headers);
+    // console.log(headers);
+  };
   const handleRowClick = async (params) => {
-    alert(params.row.id);
     let value = await axios.get(
       `${baseUrl}/api/dns/getDnsRecordById/${params.row.id}`
     );
@@ -154,6 +167,33 @@ export default function Display() {
       ErrorToastAlert("Kindly schedule the date and approve");
     }
   };
+  const updateTicketStatus = async (value) => {
+    console.log(ticket);
+    try {
+      let ticketStatus = {
+        status: value,
+        remarks: remarks,
+        id: viewRecord.ticket_id,
+      };
+      if (value === "Rejected") {
+        setShowRemarks(false);
+      } else {
+        let result = await axios.post(`${baseUrl}/api/dns/updateticketStatus`, {
+          id: ticket,
+          remarks: remarks,
+          status: value,
+        });
+
+        if (result.status == 200) {
+          SuccessToastAlert("Status Updated");
+          setShowRemarks(true);
+          fetchData();
+        }
+      }
+    } catch (error) {
+      ErrorToastAlert("Error updating status");
+    }
+  };
   const handleReject = async (value, info) => {
     if (info === "Run") {
       handleRun();
@@ -211,108 +251,179 @@ export default function Display() {
       state: { user: "Admin" },
     });
   };
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+    width: "50vw",
+    height: "99vh",
+    left: "58vw",
+  };
   return (
     <div>
       <Navbar />
 
-      <div className="work-area-implement">
-        <button className="run-btn" onClick={goToHome}>
-          Home
-        </button>
-        {jsonTableArrayData.length === 0 ? (
-          <h6>No data found</h6>
-        ) : (
-          <Box sx={{ height: 300, width: "100%" }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              rowHeight={38}
-              getRowId={(row) => row.id}
-              loading={rows.length === 0}
-              onRowClick={handleRowClick}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
+      {rows.length > 0 && (
+        <div className="work-area-implement">
+          <button className="run-btn" onClick={goToHome}>
+            Home
+          </button>
+          {jsonTableArrayData.length === 0 ? (
+            <h6>No data found</h6>
+          ) : (
+            <Box
+              sx={{ height: 300, width: "100%" }}
+              style={{
+                width: "70vw",
               }}
-              pageSizeOptions={[]}
-            />
-          </Box>
-        )}
-        <Button onClick={handleAllRun}>Run</Button>
-        <div className="modal-div" hidden={open}>
-          <div className="viewDiv">
-            <h4 className="ticketTag">
-              {viewRecord.ticket_id}
-              <button className="viewTag-btn">{viewRecord.user}</button>
-              <button className="viewTag-btn">
-                {viewRecord.dns_record_type}
-              </button>
-            </h4>
-            {viewRecord && (
-              <div>
-                <div className="value-div">
-                  <p className="viewValue">
-                    {viewRecord.dns_type || "NA"}
-                    <h4 className="viewTags">DNS Type:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.action || "NA"}
-                    <h4 className="viewTags">Action:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.c_name || "NA"}
-                    <h4 className="viewTags">c_name:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.dns_record_type || "NA"}
-                    <h4 className="viewTags">DNS Record Type:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.date || "NA"}
-                    <h4 className="viewTags">Date: </h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.dns_name || "NA"}
-                    <h4 className="viewTags">DNS Name:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.service_tier || "NA"}
-                    <h4 className="viewTags">Service Tier:</h4>{" "}
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.testing_mode || "NA"}
-                    <h4 className="viewTags">Testing Mode:</h4>{" "}
-                  </p>
+            >
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                rowHeight={38}
+                getRowId={(row) => row.id}
+                loading={rows.length === 0}
+                onRowClick={handleRowClick}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[]}
+              />
+            </Box>
+          )}
+          <Button onClick={handleAllRun}>Run</Button> &nbsp;&nbsp;&nbsp;&nbsp;
+          <Button
+            style={{
+              background:
+                (rows.length && rows[0].status) === "Approved"
+                  ? "#c3baba"
+                  : "#0d6efd",
+              border: "none",
+            }}
+            disabled={rows[0].status === "Approved"}
+            onClick={() => {
+              updateTicketStatus("Approved");
+            }}
+          >
+            {rows.length && rows[0].status === "Approved"
+              ? "Approved"
+              : "Approve"}
+          </Button>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          {showRemarks && (
+            <Button
+              onClick={() => {
+                updateTicketStatus("Rejected");
+              }}
+            >
+              Reject
+            </Button>
+          )}
+          <br></br>
+          <div style={{ display: "flex" }}>
+            {!showRemarks && (
+              <>
+                <TextField
+                  // className="remarks"
+                  id="standard-basic"
+                  label="Remarks"
+                  variant="standard"
+                  onChange={(e) => setRemarks(e.target.value)}
+                  focused
+                />
+                <br></br>
+                <Button
+                  onClick={() => {
+                    updateTicketStatus("Reject");
+                  }}
+                >
+                  Update
+                </Button>
+              </>
+            )}
+          </div>
+          <div className="modal-div" hidden={open}>
+            <div className="viewDiv">
+              <h4 className="ticketTag">
+                {viewRecord.ticket_id}
+                <button className="viewTag-btn">{viewRecord.user}</button>
+                <button className="viewTag-btn">
+                  {viewRecord.dns_record_type}
+                </button>
+              </h4>
 
-                  {/* Add more fields as needed */}
-                </div>
-                <div className="value-div">
-                  <p className="viewValue">
-                    {viewRecord.ip_address || "NA"}
-                    <h4 className="viewTags">Ip Address:</h4>{" "}
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.port_no || "NA"}
-                    <h4 className="viewTags">Port No: </h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.priority || "NA"}
-                    <h4 className="viewTags">Priority: </h4>{" "}
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.protocol || "NA"}
-                    <h4 className="viewTags">Protocol:</h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.service || "NA"}
-                    <h4 className="viewTags">Service: </h4>
-                  </p>
-                  <p className="viewValue">
-                    {viewRecord.fqdn_name || "NA"}
-                    <h4 className="viewTags">FQDN Name:</h4>
-                  </p>
-                  <p>
+              {viewRecord && (
+                <div>
+                  <div className="value-div">
+                    <p className="viewValue">
+                      {viewRecord.dns_type || "NA"}
+                      <h4 className="viewTags">DNS Type:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.action || "NA"}
+                      <h4 className="viewTags">Action:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.c_name || "NA"}
+                      <h4 className="viewTags">c_name:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.dns_record_type || "NA"}
+                      <h4 className="viewTags">DNS Record Type:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.date || "NA"}
+                      <h4 className="viewTags">Date: </h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.dns_name || "NA"}
+                      <h4 className="viewTags">DNS Name:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.service_tier || "NA"}
+                      <h4 className="viewTags">Service Tier:</h4>{" "}
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.testing_mode || "NA"}
+                      <h4 className="viewTags">Testing Mode:</h4>{" "}
+                    </p>
+
+                    {/* Add more fields as needed */}
+                  </div>
+                  <div className="value-div">
+                    <p className="viewValue">
+                      {viewRecord.ip_address || "NA"}
+                      <h4 className="viewTags">Ip Address:</h4>{" "}
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.port_no || "NA"}
+                      <h4 className="viewTags">Port No: </h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.priority || "NA"}
+                      <h4 className="viewTags">Priority: </h4>{" "}
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.protocol || "NA"}
+                      <h4 className="viewTags">Protocol:</h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.service || "NA"}
+                      <h4 className="viewTags">Service: </h4>
+                    </p>
+                    <p className="viewValue">
+                      {viewRecord.fqdn_name || "NA"}
+                      <h4 className="viewTags">FQDN Name:</h4>
+                    </p>
+                    {/* <p>
                     {!showDate && (
                       <div className="dateTypeDiv">
                         <p className="viewValue">
@@ -323,22 +434,29 @@ export default function Display() {
                         </p>
                       </div>
                     )}
-                  </p>
-                  {/* Add more fields as needed */}
+                  </p> */}
+                  </div>
                 </div>
-              </div>
-            )}
-            {!viewRecord && <p>No record selected.</p>}
-            <div className="value-div">
-              {/* <input
-                type="date"
-                className="dateTypeDiv"
-                value={scheduledDate || ""}
-                onChange={(e) => {
-                  setScheduledDate(e.target.value);
-                }}
-              /> */}
-              {showDate && (
+              )}
+              {!viewRecord && <p>No record selected.</p>}
+              <div className="value-div">
+                {showDate && (
+                  <></>
+                  // <div className="dateTypeDiv">
+                  //   <input
+                  //     type="date"
+                  //     className="dateInput"
+                  //     value={scheduledDate}
+                  //     onChange={(e) => {
+                  //       setScheduledDate(e.target.value);
+                  //     }}
+                  //   />
+                  //   {!scheduledDate && (
+                  //     <span className="placeholder">{scheduleTag}</span>
+                  //   )}
+                  // </div>
+                )}
+                {/* {reschedule && (
                 <div className="dateTypeDiv">
                   <input
                     type="date"
@@ -352,29 +470,14 @@ export default function Display() {
                     <span className="placeholder">{scheduleTag}</span>
                   )}
                 </div>
-              )}
-              {reschedule && (
-                <div className="dateTypeDiv">
-                  <input
-                    type="date"
-                    className="dateInput"
-                    value={scheduledDate}
-                    onChange={(e) => {
-                      setScheduledDate(e.target.value);
-                    }}
-                  />
-                  {!scheduledDate && (
-                    <span className="placeholder">{scheduleTag}</span>
-                  )}
-                </div>
-              )}
-              <Button
-                className="implement-display-btn"
-                onClick={handleCloseModal}
-              >
-                Close
-              </Button>
-              {!reschedule && (
+              )} */}
+                <Button
+                  className="implement-display-btn"
+                  onClick={handleCloseModal}
+                >
+                  Close
+                </Button>
+                {/* {!reschedule && (
                 <Button
                   className="implement-display-btn"
                   onClick={() => handleApprove(viewRecord.id)}
@@ -402,17 +505,37 @@ export default function Display() {
                 style={{ display: reject }}
               >
                 {viewRecord.status === "Approved" ? "Run" : "Reject"}
-              </Button>
-              <Button
-                className="implement-display-btn"
-                onClick={handleRun}
-                style={{ display: show }}
-              >
-                Run
-              </Button>
+              </Button> */}
+                <Button
+                  className="implement-display-btn"
+                  onClick={() => {
+                    handleRun();
+                  }}
+                  style={{ display: show }}
+                >
+                  Run
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+      )}
+      <div>
+        {rows.length == 0 && (
+          <h6
+            style={{
+              position: "absolute",
+              left: "49vw",
+              top: "15vh",
+              width: "100%",
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: "25px",
+            }}
+          >
+            No data found
+          </h6>
+        )}
       </div>
     </div>
   );

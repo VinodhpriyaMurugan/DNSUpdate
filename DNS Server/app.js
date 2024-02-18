@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const path = require("path"); // Import the path module
 require("dotenv").config();
 const PORT = process.env.PORT || 3100;
 // const mysql = require("mysql");
@@ -56,6 +57,60 @@ require("./ticket_routes/ticket_route")(app);
 require("./branch-routes/branch_route")(app);
 require("./branch-routes/department_route")(app);
 
+const XLSX = require("xlsx");
+const fs = require("fs");
+
+function downloadFile() {
+  console.log("Downloading file");
+  // Define column headers for each sheet
+  const columns = {
+    MX: ["zone_name", "dns_name", "ttl", "fqdn_name"],
+    SRV: [
+      "zone_name",
+      "dns_name",
+      "ttl",
+      "service",
+      "protocol",
+      "port",
+      "priority",
+      "weight",
+    ],
+    TXT: ["zone_name", "dns_name", "ttl", "target_value"],
+    A: ["zone_name", "dns_name", "ttl", "ip_address"],
+    AAAA: ["zone_name", "dns_name", "ttl", "ip_address"],
+    CNAME: ["zone_name", "dns_name", "ttl", "ip_address", "cname_target_value"],
+  };
+
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Iterate over each sheet and add data
+  Object.entries(columns).forEach(([sheetName, columnHeaders]) => {
+    // Create a new worksheet
+    const ws = XLSX.utils.aoa_to_sheet([columnHeaders]);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+  });
+
+  // Convert the workbook to a binary Excel file
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+  // Set the file path where the Excel file will be saved
+  const filePath = path.join(__dirname, "output.xlsx");
+
+  // Write the Excel file to the server
+  fs.writeFile(filePath, Buffer.from(excelBuffer), (err) => {
+    if (err) {
+      console.error("Error writing Excel file:", err);
+    } else {
+      console.log("Excel file saved:", filePath);
+
+      // Once the file is saved, send the response to the client
+    }
+  });
+}
+// app.get("/downloadExcel", downloadFile);
 app.get(
   "/runDns",
   passport.authenticate("jwt", { session: false }),
@@ -64,4 +119,5 @@ app.get(
 
 app.listen(PORT, () => {
   console.log("Server started at port ", PORT);
+  downloadFile();
 });

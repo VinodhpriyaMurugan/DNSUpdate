@@ -12,8 +12,9 @@ module.exports = (app) => {
   router.get("/getTicketsByUser/:id", ticket.getTicketsByUser);
   router.get("/searchByTicket/:ticketId", ticket.searchByTickets);
   router.post("/updateTicket", ticket.updateTickets);
-  router.get("/download/:fileName", ticket.downloadFile);
+  // router.get("/download/:fileName", ticket.downloadFile);
   router.post("/upload", upload.single("file"), ticket.uploadFile);
-  router.get("/download", ticket.downloadExcel);
+  router.get("/downloadExcel", ticket.downloadExcel);
+  router.get("/createFile", ticket.downloadFile);
   app.use("/api/ticket", router);
 };

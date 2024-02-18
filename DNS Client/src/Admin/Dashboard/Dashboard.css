@@ -93,10 +93,14 @@ img.close-btn {
 
 .top-content-area {
   position: fixed;
-  margin-top: 5%;
-  width: 84vw;
-  margin-left: 215px;
-  height: 85vh;
+  /* margin-top: 5%; */
+  width: 94vw;
+  /* margin-left: 215px; */
+  margin-left: 4vw;
+  margin-right: 2vw;
+  margin-top: 3vw;
+  margin-bottom: 1vw;
+  height: 92vh;
   /* background-color: aqua; */
 }
 .content-area {
@@ -128,10 +132,8 @@ button.serach-btn {
 }
 .data-div {
   position: relative;
-  width: 70vw;
-  height: 23vh;
-  /* left: 25vw; */
-  /* background-color: antiquewhite; */
+  width: 25vw;
+  margin-left: 5vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -145,6 +147,22 @@ button.implement-btn {
   background-color: #0acdaa;
   border-radius: 4px;
 }
+.top-content-div-user {
+  position: relative;
+  display: flex;
+}
+.top-content-area-user {
+  position: relative;
+  /* margin-top: 2%; */
+  width: 94vw;
+  /* margin-left: 215px; */
+  /* margin-left: 4vw; */
+  /* margin-right: 2vw; */
+
+  /* margin-bottom: 1vw; */
+  height: 5vh;
+  /* background-color: aqua; */
+}
 input.search-btn {
   width: 250px;
   height: 45px;
@@ -155,20 +173,22 @@ input.search-btn {
 }
 .top-content-div {
   position: relative;
-  width: 135vw;
+  /* width: 94vw; */
   height: 23vh;
   /* left: 25vw; */
   /* background-color: antiquewhite; */
-  display: grid;
+  display: flex;
   grid-template-columns: 1fr 1fr;
+  justify-content: space-evenly;
+  align-items: center;
 }
 .info-item {
   display: grid;
-  width: 15vw;
-  height: 19vh;
+  /* width: 7vw; */
+  /* height: 7vh; */
   justify-items: center;
   align-content: space-around;
-  background-color: #0acdaa14;
+  /* background-color: #0acdaa14; */
   color: rgba(0, 0, 0, 0.87);
   transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   border-radius: 4px;

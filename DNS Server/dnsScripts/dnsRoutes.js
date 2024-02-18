@@ -11,6 +11,8 @@ module.exports = (app) => {
   router.get("/getDnsRecordById/:id", dnsRecord.getDnsRecordById);
   router.post("/getDnsRecordByUser/:id", dnsRecord.getDnsRecordByUser);
   router.post("/updateDnsRecord", dnsRecord.updateDnsRecord);
+  router.post("/updateticketStatus", dnsRecord.updateTicketStatus);
+
   router.get("/getDnsRecordByType/:type", dnsRecord.getDnsRecordByType);
   router.get("/getDnsRecordByDate/:date", dnsRecord.getDnsRecordByDate);
   router.get("/getTypeUnscheduled/:type", dnsRecord.getTypeUnscheduled);

@@ -77,6 +77,15 @@ module.exports = (sequelize, Sequelize) => {
     status: {
       type: Sequelize.STRING,
     },
+    ttl: {
+      type: Sequelize.STRING,
+    },
+    target_value: {
+      type: Sequelize.STRING,
+    },
+    remarks: {
+      type: Sequelize.STRING,
+    },
   });
   return DNS_Record;
 };

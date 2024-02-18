@@ -6,6 +6,7 @@ import Navbar from "../Navbar/Navbar";
 import "./Registration.css";
 import { useNavigate } from "react-router-dom";
 import { ErrorToastAlert, SuccessToastAlert } from "./Toast";
+import Subuser from "./Subuser/Subuser";
 const baseUrl = "http://localhost:3100";
 
 function RegistrationForm(props) {
@@ -39,6 +40,7 @@ function RegistrationForm(props) {
       axios
         .get(`${baseUrl}/api/users/getUser/${userValue}`)
         .then((response) => {
+          console.log("User id", userValue);
           const userData = response.data;
           setName(userData.user_name);
           setEmail(userData.email_id);
@@ -139,10 +141,14 @@ function RegistrationForm(props) {
   return (
     <div>
       <Navbar />
-      <div className="work-area-registration">
+      <div className="work-area-registration-left">
+        <br></br>
         <button className="run-btn" onClick={goToHome}>
           Home
         </button>
+        <Subuser />
+      </div>
+      <div className="work-area-registration">
         <h2>User Registration</h2>
         <form onSubmit={handleSubmit}>
           <div className="row">
